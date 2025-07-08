@@ -1,3 +1,7 @@
+<p align="left">
+  <img src="docs/icons/github_readme.png" alt="Zenix Project Icon" />
+</p>
+
 # Zenix: MSX2+ Emulator
 
 **Zenix** is a modern, high-fidelity emulator for the MSX1, MSX2, and MSX2+ home computer systems.  
