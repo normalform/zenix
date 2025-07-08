@@ -7,14 +7,14 @@ This document provides links to official datasheets, standards, and emulator ref
 ## 📚 CPU – Zilog Z80
 
 - [Z80 CPU User Manual (Zilog)](https://www.zilog.com/docs/z80/um0080.pdf)
-- Z80 Assembly Programming Manual (Zilog) - TBD
+- Z80 Assembly Programming Manual (Zilog) – link forthcoming
 - [ZEXALL Test Suite](http://mdfs.net/Software/Z80/Exerciser/)
 
 ---
 
 ## 🎨 VDP – TMS9918A / V9938 / V9958
 
-- TMS9918A Video Display Processor Datasheet (TI) - TBD
+- TMS9918A Video Display Processor Datasheet (TI) – link forthcoming
 - [Yamaha V9938 Application Manual (MSX2)](http://map.grauw.nl/resources/video/yamaha_v9938.pdf)
 - [Yamaha V9958 Application Manual (MSX2+)](http://map.grauw.nl/resources/video/yamaha_v9958.pdf)
 
@@ -22,23 +22,23 @@ This document provides links to official datasheets, standards, and emulator ref
 
 ## 🔊 Audio – AY-3-8910 PSG
 
-- AY-3-8910 Programmable Sound Generator Datasheet (GI) - TBD
-- PSG Programming Guide (Atari-compatible) - TBD
+- AY-3-8910 Programmable Sound Generator Datasheet (GI) – link forthcoming
+- PSG Programming Guide (Atari-compatible) – link forthcoming
 
 ---
 
 ## 💾 Disk System
 
-- WD2793 Floppy Disk Controller Datasheet - TBD
-- MSX-DOS 1 Technical Manual - TBD
-- MSX-DOS 2 Function Reference - TBD
+- WD2793 Floppy Disk Controller Datasheet – link forthcoming
+- MSX-DOS 1 Technical Manual – link forthcoming
+- MSX-DOS 2 Function Reference – link forthcoming
 
 ---
 
 ## 🧠 FPGA and Emulator Protocols
 
 - [Type-Length-Value (TLV) Format Overview](https://en.wikipedia.org/wiki/Type-length-value)
-- USB CDC (Communications Device Class) Spec - TBD
+- USB CDC (Communications Device Class) Spec – link forthcoming
 - [ESP32 USB Bridge Firmware (TinyUSB)](https://github.com/hathach/tinyusb)
 
 ---
