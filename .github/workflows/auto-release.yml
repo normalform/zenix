@@ -1,0 +1,306 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of release'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+        - auto
+        - patch
+        - minor
+        - major
+
+env:
+  BUILD_NUMBER: ${{ github.run_number }}
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      release_type: ${{ steps.check.outputs.release_type }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check if release needed
+      id: check
+      run: |
+        # Check if this is a manual workflow dispatch
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "should_release=true" >> $GITHUB_OUTPUT
+          echo "release_type=${{ inputs.release_type }}" >> $GITHUB_OUTPUT
+          echo "🚀 Manual release triggered"
+          exit 0
+        fi
+        
+        # For push events, check if we should create a release
+        # Skip if commit message contains [skip release] or [no release]
+        COMMIT_MSG="${{ github.event.head_commit.message }}"
+        if echo "$COMMIT_MSG" | grep -q "\[skip release\]\|\[no release\]"; then
+          echo "should_release=false" >> $GITHUB_OUTPUT
+          echo "⏭️ Release skipped due to commit message"
+          exit 0
+        fi
+        
+        # Check if there are any changes to source code (not just docs/README)
+        CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+        if echo "$CHANGED_FILES" | grep -q "^src/\|^tests/\|\.csproj$\|version\.json$"; then
+          echo "should_release=true" >> $GITHUB_OUTPUT
+          echo "release_type=auto" >> $GITHUB_OUTPUT
+          echo "✅ Source code changes detected, release needed"
+        else
+          echo "should_release=false" >> $GITHUB_OUTPUT
+          echo "📝 Only documentation changes, skipping release"
+        fi
+
+  versioning:
+    runs-on: ubuntu-latest
+    needs: check-changes
+    if: needs.check-changes.outputs.should_release == 'true'
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      assembly-version: ${{ steps.version.outputs.assembly-version }}
+      file-version: ${{ steps.version.outputs.file-version }}
+      tag-name: ${{ steps.version.outputs.tag-name }}
+      release-notes: ${{ steps.notes.outputs.release-notes }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Calculate version
+      id: version
+      run: |
+        MAJOR=$(jq -r '.major' version.json)
+        MINOR=$(jq -r '.minor' version.json)
+        BUILD=${{ env.BUILD_NUMBER }}
+        
+        VERSION="${MAJOR}.${MINOR}.${BUILD}"
+        ASSEMBLY_VERSION="${MAJOR}.${MINOR}.0.0"
+        FILE_VERSION="${MAJOR}.${MINOR}.${BUILD}.0"
+        TAG_NAME="v${VERSION}"
+        
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "assembly-version=${ASSEMBLY_VERSION}" >> $GITHUB_OUTPUT
+        echo "file-version=${FILE_VERSION}" >> $GITHUB_OUTPUT
+        echo "tag-name=${TAG_NAME}" >> $GITHUB_OUTPUT
+        
+        echo "📦 Release Version: ${VERSION}"
+        echo "🏷️ Tag Name: ${TAG_NAME}"
+
+    - name: Generate release notes
+      id: notes
+      run: |
+        # Get the last release tag
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        
+        if [ -z "$LAST_TAG" ]; then
+          echo "🎉 This is the first release!"
+          RELEASE_NOTES="## 🎉 First Release
+
+        This is the initial release of Zenix MSX Emulator.
+
+        ### Features
+        - MSX computer emulation core
+        - Z80 CPU implementation  
+        - Memory management system
+        - Cross-platform support (Windows, Linux, macOS)
+
+        ### Technical Details
+        - Built with .NET 8.0
+        - Comprehensive test suite
+        - Automated CI/CD pipeline"
+        else
+          echo "📝 Generating release notes since $LAST_TAG"
+          
+          # Get commit count and basic info
+          COMMIT_COUNT=$(git rev-list ${LAST_TAG}..HEAD --count)
+          RELEASE_DATE=$(date +'%Y-%m-%d')
+          
+          RELEASE_NOTES="## 🚀 What's New in v${{ steps.version.outputs.version }}
+
+        ### 📊 Release Statistics
+        - **Commits since last release**: ${COMMIT_COUNT}
+        - **Build Number**: ${{ env.BUILD_NUMBER }}
+        - **Release Date**: ${RELEASE_DATE}"
+          
+          # Get commit messages since last release
+          COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+          
+          # Add changes section
+          if [ -n "$COMMITS" ]; then
+            RELEASE_NOTES="${RELEASE_NOTES}
+
+        ### 📝 Changes
+        $COMMITS"
+          fi
+        fi
+        
+        # Add common sections to all releases
+        RELEASE_NOTES="${RELEASE_NOTES}
+
+        ### 📦 Downloads
+        - **Windows x64**: \`zenix-win-x64.zip\`
+        - **Linux x64**: \`zenix-linux-x64.tar.gz\`
+        - **macOS x64**: \`zenix-macos-x64.tar.gz\`
+
+        ### 🔗 Links
+        - [Installation Guide](https://github.com/${{ github.repository }}/blob/main/README.md)
+        - [Documentation](https://github.com/${{ github.repository }}/tree/main/docs)"
+        
+        if [ -n "$LAST_TAG" ]; then
+          RELEASE_NOTES="${RELEASE_NOTES}
+        - [Full Changelog](https://github.com/${{ github.repository }}/compare/${LAST_TAG}...v${{ steps.version.outputs.version }})"
+        fi
+        
+        RELEASE_NOTES="${RELEASE_NOTES}
+
+        ---
+        *This release was automatically generated from the main branch.*"
+        
+        # Save release notes to output
+        echo "release-notes<<EOF" >> $GITHUB_OUTPUT
+        echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: [check-changes, versioning]
+    if: needs.check-changes.outputs.should_release == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore -p:Version=${{ needs.versioning.outputs.version }} -p:AssemblyVersion=${{ needs.versioning.outputs.assembly-version }} -p:FileVersion=${{ needs.versioning.outputs.file-version }}
+
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [check-changes, versioning, build-and-test]
+    if: needs.check-changes.outputs.should_release == 'true'
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Create Git tag
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a ${{ needs.versioning.outputs.tag-name }} -m "Release ${{ needs.versioning.outputs.tag-name }}"
+        git push origin ${{ needs.versioning.outputs.tag-name }}
+
+    - name: Create GitHub release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.versioning.outputs.tag-name }}
+        release_name: "Zenix ${{ needs.versioning.outputs.tag-name }}"
+        body: ${{ needs.versioning.outputs.release-notes }}
+        draft: false
+        prerelease: false
+
+  build-artifacts:
+    needs: [check-changes, versioning, create-release]
+    if: needs.check-changes.outputs.should_release == 'true'
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            runtime: win-x64
+            artifact-name: zenix-win-x64
+            file-extension: .zip
+          - os: ubuntu-latest
+            runtime: linux-x64
+            artifact-name: zenix-linux-x64
+            file-extension: .tar.gz
+          - os: macos-latest
+            runtime: osx-x64
+            artifact-name: zenix-macos-x64
+            file-extension: .tar.gz
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Publish self-contained
+      run: dotnet publish src/Zenix.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true --output ./publish/ -p:Version=${{ needs.versioning.outputs.version }} -p:AssemblyVersion=${{ needs.versioning.outputs.assembly-version }} -p:FileVersion=${{ needs.versioning.outputs.file-version }}
+
+    - name: Create archive (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cd publish
+        7z a -tzip ../${{ matrix.artifact-name }}${{ matrix.file-extension }} *
+
+    - name: Create archive (Unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        cd publish
+        tar -czf ../${{ matrix.artifact-name }}${{ matrix.file-extension }} *
+
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./${{ matrix.artifact-name }}${{ matrix.file-extension }}
+        asset_name: ${{ matrix.artifact-name }}${{ matrix.file-extension }}
+        asset_content_type: ${{ matrix.os == 'windows-latest' && 'application/zip' || 'application/gzip' }}
+
+  notification:
+    runs-on: ubuntu-latest
+    needs: [check-changes, versioning, build-artifacts]
+    if: always() && needs.check-changes.outputs.should_release == 'true'
+    
+    steps:
+    - name: Release status summary
+      run: |
+        if [ "${{ needs.build-artifacts.result }}" == "success" ]; then
+          echo "🎉 Release ${{ needs.versioning.outputs.tag-name }} created successfully!"
+          echo "📦 Artifacts uploaded for all platforms"
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.versioning.outputs.tag-name }}"
+        else
+          echo "❌ Release creation failed"
+          echo "Please check the workflow logs for details"
+          exit 1
+        fi

@@ -1,0 +1,76 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build-debug",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"--configuration",
+				"Debug"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$msCompile"
+			]
+		},
+		{
+			"label": "build-release",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"--configuration",
+				"Release"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$msCompile"
+			]
+		},
+		{
+			"label": "test",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test",
+				"tests/Zenix.Tests.csproj"
+			],
+			"group": "test",
+			"problemMatcher": [
+				"$msCompile"
+			]
+		},
+		{
+			"label": "test-debug",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test",
+				"tests/Zenix.Tests.csproj",
+				"--configuration",
+				"Debug"
+			],
+			"group": "test",
+			"problemMatcher": [
+				"$msCompile"
+			]
+		},
+		{
+			"label": "test-release",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test",
+				"tests/Zenix.Tests.csproj",
+				"--configuration",
+				"Release"
+			],
+			"group": "test",
+			"problemMatcher": [
+				"$msCompile"
+			]
+		}
+	]
+}

@@ -116,7 +116,7 @@ src/
 ├── App/               # Application layer: emulation loop, orchestrators
 ├── Infrastructure/    # SDL, Blazor, Telemetry, I/O, FPGA
 ├── CLI/               # CLI frontend
-├── Web/               # Blazor WebAssembly frontend
+└── Web/               # Blazor WebAssembly frontend
 tests/                 # xUnit test projects
 ```
 

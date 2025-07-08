@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Zenix</AssemblyName>
+    <RootNamespace>Zenix</RootNamespace>
+    <StartupObject>Zenix.CLI.Program</StartupObject>
+    
+    <!-- Version information -->
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyTitle>Zenix MSX Emulator</AssemblyTitle>
+    <AssemblyDescription>A modern MSX computer emulator</AssemblyDescription>
+    <AssemblyCompany>Zenix Project</AssemblyCompany>
+    <AssemblyProduct>Zenix</AssemblyProduct>
+    <AssemblyCopyright>Copyright © $(Year)</AssemblyCopyright>
+  </PropertyGroup>
+
+</Project>
