@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  BUILD_NUMBER: ${{ github.run_number }}
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      assembly-version: ${{ steps.version.outputs.assembly-version }}
+      file-version: ${{ steps.version.outputs.file-version }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Calculate version
+      id: version
+      run: |
+        MAJOR=$(jq -r '.major' version.json)
+        MINOR=$(jq -r '.minor' version.json)
+        BUILD=${{ env.BUILD_NUMBER }}
+        
+        VERSION="${MAJOR}.${MINOR}.${BUILD}"
+        ASSEMBLY_VERSION="${MAJOR}.${MINOR}.0.0"
+        FILE_VERSION="${MAJOR}.${MINOR}.${BUILD}.0"
+        
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "assembly-version=${ASSEMBLY_VERSION}" >> $GITHUB_OUTPUT
+        echo "file-version=${FILE_VERSION}" >> $GITHUB_OUTPUT
+        
+        echo "📦 Version: ${VERSION}"
+        echo "🔧 Assembly Version: ${ASSEMBLY_VERSION}"
+        echo "📄 File Version: ${FILE_VERSION}"
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: versioning
+    
+    strategy:
+      matrix:
+        dotnet-version: [ '8.0.x' ]
+        configuration: [ Debug, Release ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration ${{ matrix.configuration }} --no-restore -p:Version=${{ needs.versioning.outputs.version }} -p:AssemblyVersion=${{ needs.versioning.outputs.assembly-version }} -p:FileVersion=${{ needs.versioning.outputs.file-version }}
+
+    - name: Run tests
+      run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: matrix.configuration == 'Release'
+      with:
+        files: '**/coverage.cobertura.xml'
+        fail_ci_if_error: false
+
+  build-windows:
+    runs-on: windows-latest
+    needs: versioning
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution (Release)
+      run: dotnet build --configuration Release --no-restore -p:Version=${{ needs.versioning.outputs.version }} -p:AssemblyVersion=${{ needs.versioning.outputs.assembly-version }} -p:FileVersion=${{ needs.versioning.outputs.file-version }}
+
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Publish application
+      run: dotnet publish src/Zenix.csproj --configuration Release --output ./publish --no-build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: zenix-windows-release-v${{ needs.versioning.outputs.version }}
+        path: ./publish/
+        retention-days: 30
+
+  build-macos:
+    runs-on: macos-latest
+    needs: versioning
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution (Release)
+      run: dotnet build --configuration Release --no-restore -p:Version=${{ needs.versioning.outputs.version }} -p:AssemblyVersion=${{ needs.versioning.outputs.assembly-version }} -p:FileVersion=${{ needs.versioning.outputs.file-version }}
+
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Publish application
+      run: dotnet publish src/Zenix.csproj --configuration Release --output ./publish --no-build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: zenix-macos-release-v${{ needs.versioning.outputs.version }}
+        path: ./publish/
+        retention-days: 30

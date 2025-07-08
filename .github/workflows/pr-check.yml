@@ -1,0 +1,124 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  pr-validation:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        configuration: [ Debug, Release ]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution (${{ matrix.configuration }})
+      run: dotnet build --configuration ${{ matrix.configuration }} --no-restore --verbosity minimal
+
+    - name: Run tests (${{ matrix.configuration }})
+      run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal --logger trx --results-directory TestResults/
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.configuration }}
+        path: TestResults/
+        retention-days: 7
+
+  pr-summary:
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: always()
+    
+    steps:
+    - name: Check PR validation results
+      run: |
+        if [ "${{ needs.pr-validation.result }}" == "failure" ]; then
+          echo "❌ PR validation failed"
+          exit 1
+        elif [ "${{ needs.pr-validation.result }}" == "cancelled" ]; then
+          echo "⚠️ PR validation was cancelled"
+          exit 1
+        else
+          echo "✅ PR validation passed"
+        fi
+
+    - name: Comment PR status
+      uses: actions/github-script@v7
+      if: always()
+      with:
+        script: |
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('🔍 PR Check Results')
+          );
+          
+          const status = '${{ needs.pr-validation.result }}';
+          const emoji = status === 'success' ? '✅' : status === 'failure' ? '❌' : '⚠️';
+          const statusText = status === 'success' ? 'PASSED' : status === 'failure' ? 'FAILED' : 'CANCELLED';
+          
+          const body = `🔍 **PR Check Results**
+          
+          **Status**: ${emoji} ${statusText}
+          
+          **Build & Test Matrix**:
+          - Debug Configuration: ${status === 'success' ? '✅' : '❌'}
+          - Release Configuration: ${status === 'success' ? '✅' : '❌'}
+          
+          ${status === 'success' ? 
+            '🎉 All checks passed! This PR is ready for review.' : 
+            '⚠️ Some checks failed. Please review the logs and fix any issues.'
+          }
+          
+          <details>
+          <summary>View workflow run</summary>
+          
+          [View details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          </details>`;
+          
+          if (botComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: body
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+          }
