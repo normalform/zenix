@@ -37,35 +37,20 @@ dotnet run --project src/Zenix --rom path/to/game.rom --model MSX2+
 
 ---
 
-## 🧱 Architecture
+## 📚 Project Documentation
 
-- 🧩 **Domain-Driven Design** with **Onion Architecture**
-- 🧪 Built using **Test-Driven Development**
-- 🧠 Includes visual and telemetry-based observability
-- 📦 Configurable model, RAM/VRAM, ROM slots, and TGC
+All core documents are located in the [`/docs/project`](docs/project) folder:
 
-```mermaid
-graph TD
-  UI[CLI / WASM UI]
-  App[Application Layer]
-  Domain[Z80 / VDP / PSG / Memory / Disk]
-  Infra[USB / Audio / Telemetry / Storage]
-  UI --> App --> Domain --> Infra
-```
-
----
-
-## 📦 Project Structure
-
-```text
-Zenix/
-├── src/               # Main emulator core and frontend
-├── tests/             # Unit and integration tests
-├── docs/              # Markdown docs with Mermaid diagrams
-├── .github/workflows/ # CI/CD (GitHub Actions)
-├── VERSION            # Semantic version file
-└── README.md          # This file
-```
+1. [📘 Introduction](docs/project/01_introduction.md)
+2. [📋 Use Case Analysis](docs/project/02_usecase_analysis.md)
+3. [⚠️ Risk Analysis with Mitigation](docs/project/03_risk_analysis.md)
+4. [📌 Requirements](docs/project/04_requirements.md)
+5. [🧱 Architecture](docs/project/05_architecture.md)
+6. [🧩 Design Description](docs/project/06_design_description.md)
+7. [✅ Verification and Validation](docs/project/07_verification_validation.md)
+8. [🔗 Traceability Matrix](docs/project/08_traceability_matrix.md)
+9. [🧠 FPGA Protocol](docs/project/09_fpga_protocol.md)
+10. [📖 Glossary](docs/project/10_glossary.md)
 
 ---
 
@@ -94,4 +79,3 @@ Please read `CONTRIBUTING.md` (coming soon) for guidelines.
 ## 🌟 Support the Project
 
 If you enjoy Zenix, consider ⭐ starring the repo, opening issues, or sharing feedback!
-
