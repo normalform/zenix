@@ -1,6 +1,6 @@
 # 📋 Use Case Analysis – Zenix Emulator
 
-This document outlines the core user-driven use cases for Zenix, a modern MSulator for MSX1/2/2+ systems. These use cases cover gameplay, configuration, development, testing, and optional hardware integration — all aligned with the project’s architecture and observability goals.
+This document outlines the core user-driven use cases for Zenix, a modern emulator for MSX1/2/2+ systems. These use cases cover gameplay, configuration, development, testing, and optional hardware integration — all aligned with the project’s architecture and observability goals.
 
 ---
 
