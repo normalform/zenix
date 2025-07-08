@@ -2,47 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenix.Core", "src/Core/Zenix.Core.csproj", "{91d6e6b0-ddc4-44ec-a5c9-67027f686aa1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenix.App", "src/App/Zenix.App.csproj", "{ad7c9e6e-b7b6-4478-914f-da6801a6fe5a}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenix.CLI", "src/CLI/Zenix.CLI.csproj", "{2a1010c9-03c9-43f3-aa47-4f9a170f31dc}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenix.Infrastructure", "src/Infrastructure/Zenix.Infrastructure.csproj", "{4d4413de-2a22-4ca8-8566-dcc0cb0d70da}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenix.Web", "src/Web/Zenix.Web.csproj", "{a3f8941f-c17a-456a-b92c-a5568eede087}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenix.Core.Tests", "tests/Core.Tests/Zenix.Core.Tests.csproj", "{7a708152-9558-4fe7-8835-1f3cbec436e9}"
-EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution
         Debug|Any CPU = Debug|Any CPU
         Release|Any CPU = Release|Any CPU
-    EndGlobalSection
-    GlobalSection(ProjectConfigurationPlatforms) = postSolution
-        {91d6e6b0-ddc4-44ec-a5c9-67027f686aa1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {91d6e6b0-ddc4-44ec-a5c9-67027f686aa1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {91d6e6b0-ddc4-44ec-a5c9-67027f686aa1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {91d6e6b0-ddc4-44ec-a5c9-67027f686aa1}.Release|Any CPU.Build.0 = Release|Any CPU
-        {ad7c9e6e-b7b6-4478-914f-da6801a6fe5a}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {ad7c9e6e-b7b6-4478-914f-da6801a6fe5a}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {ad7c9e6e-b7b6-4478-914f-da6801a6fe5a}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {ad7c9e6e-b7b6-4478-914f-da6801a6fe5a}.Release|Any CPU.Build.0 = Release|Any CPU
-        {2a1010c9-03c9-43f3-aa47-4f9a170f31dc}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {2a1010c9-03c9-43f3-aa47-4f9a170f31dc}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {2a1010c9-03c9-43f3-aa47-4f9a170f31dc}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {2a1010c9-03c9-43f3-aa47-4f9a170f31dc}.Release|Any CPU.Build.0 = Release|Any CPU
-        {4d4413de-2a22-4ca8-8566-dcc0cb0d70da}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {4d4413de-2a22-4ca8-8566-dcc0cb0d70da}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {4d4413de-2a22-4ca8-8566-dcc0cb0d70da}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {4d4413de-2a22-4ca8-8566-dcc0cb0d70da}.Release|Any CPU.Build.0 = Release|Any CPU
-        {a3f8941f-c17a-456a-b92c-a5568eede087}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {a3f8941f-c17a-456a-b92c-a5568eede087}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {a3f8941f-c17a-456a-b92c-a5568eede087}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {a3f8941f-c17a-456a-b92c-a5568eede087}.Release|Any CPU.Build.0 = Release|Any CPU
-        {7a708152-9558-4fe7-8835-1f3cbec436e9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {7a708152-9558-4fe7-8835-1f3cbec436e9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {7a708152-9558-4fe7-8835-1f3cbec436e9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {7a708152-9558-4fe7-8835-1f3cbec436e9}.Release|Any CPU.Build.0 = Release|Any CPU
     EndGlobalSection
 EndGlobal
