@@ -16,6 +16,11 @@ on:
         - minor
         - major
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 env:
   BUILD_NUMBER: ${{ github.run_number }}
 
@@ -202,29 +207,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: [check-changes, versioning, build-and-test]
     if: needs.check-changes.outputs.should_release == 'true'
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      release_id: ${{ steps.create_release.outputs.id }}
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Create Git tag
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git tag -a ${{ needs.versioning.outputs.tag-name }} -m "Release ${{ needs.versioning.outputs.tag-name }}"
-        git push origin ${{ needs.versioning.outputs.tag-name }}
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
 
     - name: Create GitHub release
       id: create_release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ needs.versioning.outputs.tag-name }}
-        release_name: "Zenix ${{ needs.versioning.outputs.tag-name }}"
+        name: "Zenix ${{ needs.versioning.outputs.tag-name }}"
         body: ${{ needs.versioning.outputs.release-notes }}
         draft: false
         prerelease: false
@@ -278,14 +276,12 @@ jobs:
         tar -czf ../${{ matrix.artifact-name }}${{ matrix.file-extension }} *
 
     - name: Upload release asset
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./${{ matrix.artifact-name }}${{ matrix.file-extension }}
-        asset_name: ${{ matrix.artifact-name }}${{ matrix.file-extension }}
-        asset_content_type: ${{ matrix.os == 'windows-latest' && 'application/zip' || 'application/gzip' }}
+        tag_name: ${{ needs.versioning.outputs.tag-name }}
+        files: ./${{ matrix.artifact-name }}${{ matrix.file-extension }}
 
   notification:
     runs-on: ubuntu-latest
