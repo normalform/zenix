@@ -68,7 +68,7 @@ jobs:
       run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal --collect:"XPlat Code Coverage"
 
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       if: matrix.configuration == 'Release'
       with:
         files: '**/coverage.cobertura.xml'
