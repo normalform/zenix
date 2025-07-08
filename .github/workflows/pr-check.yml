@@ -5,6 +5,12 @@ on:
     branches: [ main, develop ]
     types: [ opened, synchronize, reopened ]
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+
 jobs:
   pr-validation:
     runs-on: ubuntu-latest
@@ -72,53 +78,97 @@ jobs:
       uses: actions/github-script@v7
       if: always()
       with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const { data: comments } = await github.rest.issues.listComments({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.issue.number,
-          });
-          
-          const botComment = comments.find(comment => 
-            comment.user.type === 'Bot' && 
-            comment.body.includes('🔍 PR Check Results')
-          );
-          
-          const status = '${{ needs.pr-validation.result }}';
-          const emoji = status === 'success' ? '✅' : status === 'failure' ? '❌' : '⚠️';
-          const statusText = status === 'success' ? 'PASSED' : status === 'failure' ? 'FAILED' : 'CANCELLED';
-          
-          const body = `🔍 **PR Check Results**
-          
-          **Status**: ${emoji} ${statusText}
-          
-          **Build & Test Matrix**:
-          - Debug Configuration: ${status === 'success' ? '✅' : '❌'}
-          - Release Configuration: ${status === 'success' ? '✅' : '❌'}
-          
-          ${status === 'success' ? 
-            '🎉 All checks passed! This PR is ready for review.' : 
-            '⚠️ Some checks failed. Please review the logs and fix any issues.'
-          }
-          
-          <details>
-          <summary>View workflow run</summary>
-          
-          [View details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          </details>`;
-          
-          if (botComment) {
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: botComment.id,
-              body: body
-            });
-          } else {
-            await github.rest.issues.createComment({
+          try {
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: body
             });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🔍 PR Check Results')
+            );
+            
+            const status = '${{ needs.pr-validation.result }}';
+            const emoji = status === 'success' ? '✅' : status === 'failure' ? '❌' : '⚠️';
+            const statusText = status === 'success' ? 'PASSED' : status === 'failure' ? 'FAILED' : 'CANCELLED';
+            
+            const body = `🔍 **PR Check Results**
+            
+            **Status**: ${emoji} ${statusText}
+            
+            **Build & Test Matrix**:
+            - Debug Configuration: ${status === 'success' ? '✅' : '❌'}
+            - Release Configuration: ${status === 'success' ? '✅' : '❌'}
+            
+            ${status === 'success' ? 
+              '🎉 All checks passed! This PR is ready for review.' : 
+              '⚠️ Some checks failed. Please review the logs and fix any issues.'
+            }
+            
+            <details>
+            <summary>View workflow run</summary>
+            
+            [View details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            </details>`;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+              console.log('✅ Updated existing PR comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+              console.log('✅ Created new PR comment');
+            }
+          } catch (error) {
+            console.error('❌ Failed to comment on PR:', error.message);
+            console.log('ℹ️  This might be due to insufficient permissions or repo settings');
+            console.log('📊 PR Status:', '${{ needs.pr-validation.result }}');
+            // Don't fail the workflow if commenting fails
           }
+
+    - name: Create job summary
+      if: always()
+      run: |
+        STATUS="${{ needs.pr-validation.result }}"
+        if [ "$STATUS" == "success" ]; then
+          EMOJI="✅"
+          STATUS_TEXT="PASSED"
+          MESSAGE="🎉 All checks passed! This PR is ready for review."
+        elif [ "$STATUS" == "failure" ]; then
+          EMOJI="❌"
+          STATUS_TEXT="FAILED"
+          MESSAGE="⚠️ Some checks failed. Please review the logs and fix any issues."
+        else
+          EMOJI="⚠️"
+          STATUS_TEXT="CANCELLED"
+          MESSAGE="⚠️ PR validation was cancelled."
+        fi
+        
+        cat >> $GITHUB_STEP_SUMMARY << EOF
+        # 🔍 PR Check Results
+        
+        **Status**: ${EMOJI} ${STATUS_TEXT}
+        
+        ## Build & Test Matrix
+        - Debug Configuration: ${EMOJI}
+        - Release Configuration: ${EMOJI}
+        
+        ${MESSAGE}
+        
+        ### View Details
+        - [Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        - [PR #${{ github.event.number }}](https://github.com/${{ github.repository }}/pull/${{ github.event.number }})
+        EOF
