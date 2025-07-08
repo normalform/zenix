@@ -19,13 +19,16 @@ Zenix uses a modern DevOps approach with automated CI/CD pipelines, semantic ver
 
 ### Key Features
 
-- 🔄 **Automated CI/CD** - Full pipeline automation
-- 📦 **Semantic Versioning** - `major.minor.build` format
+- 🔄 **Automated CI/CD** - Full pipeline automation with continuous deployment
+- 📦 **Semantic Versioning** - `major.minor.build` format with auto-increment
 - 🌐 **Cross-Platform** - Windows, Linux, macOS support
 - 🧪 **Comprehensive Testing** - Debug and Release configurations
 - 🔒 **Security Scanning** - CodeQL analysis
 - 📊 **Code Coverage** - Automated coverage reporting
-- 🚀 **Automated Releases** - Tag-based release deployment
+- 🚀 **Continuous Deployment** - Automatic releases on main branch updates
+- 🎯 **Smart Release Logic** - Intelligent change detection and release decisions
+- 📝 **Auto Release Notes** - Generated from commit history
+- ⚡ **Manual Override** - Workflow dispatch and skip options
 
 ## Versioning Strategy
 
@@ -91,16 +94,22 @@ graph LR
 ### Pipeline Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Pull Request  │    │      Push       │    │   Tag Release   │
-│                 │    │   (main/dev)    │    │   (v*.*.*)      │
-└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
-          │                      │                      │
-          ▼                      ▼                      ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   PR Check      │    │   Full CI       │    │   Release       │
-│   Workflow      │    │   Workflow      │    │   Workflow      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Pull Request  │    │   Push to Dev   │    │  Push to Main   │    │   Tag Release   │
+│                 │    │                 │    │                 │    │   (v*.*.*)      │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │                      │
+          ▼                      ▼                      ▼                      ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   PR Check      │    │   Full CI       │    │  Auto Release   │    │ Manual Release  │
+│   Workflow      │    │   Workflow      │    │   Workflow      │    │   Workflow      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+                                              │                                      │
+                                              ▼                                      │
+                                    ┌─────────────────┐                             │
+                                    │ Continuous      │◄────────────────────────────┘
+                                    │ Deployment      │
+                                    └─────────────────┘
 ```
 
 ### Build Matrix
@@ -143,11 +152,30 @@ graph LR
 - Code coverage reports
 - Test results
 
-### 3. Release Workflow (`.github/workflows/release.yml`)
+### 3. Auto Release Workflow (`.github/workflows/auto-release.yml`)
+
+**Triggers:** Push to `main` branch, manual workflow dispatch
+
+**Purpose:** Continuous deployment with automatic release creation
+
+**Features:**
+- Smart change detection (source vs. documentation)
+- Automatic version calculation and tagging
+- Intelligent release notes generation
+- Skip release option via commit message
+- Manual release triggers with type selection
+
+**Workflow Logic:**
+- Analyzes changes to determine if release is needed
+- Skips releases for documentation-only changes
+- Honors `[skip release]` or `[no release]` in commit messages
+- Creates releases for source code, test, or project file changes
+
+### 4. Release Workflow (`.github/workflows/release.yml`)
 
 **Triggers:** Tags matching `v*.*.*`
 
-**Purpose:** Automated release creation and distribution
+**Purpose:** Manual tag-based release creation and distribution
 
 **Features:**
 - Cross-platform self-contained executables
@@ -155,7 +183,7 @@ graph LR
 - Release notes generation
 - Multi-platform artifact upload
 
-### 4. CodeQL Security Workflow (`.github/workflows/codeql.yml`)
+### 5. CodeQL Security Workflow (`.github/workflows/codeql.yml`)
 
 **Triggers:** Push, PR, weekly schedule
 
@@ -166,7 +194,7 @@ graph LR
 - Security and quality queries
 - Automated security alerts
 
-### 5. Dependabot Configuration (`.github/dependabot.yml`)
+### 6. Dependabot Configuration (`.github/dependabot.yml`)
 
 **Purpose:** Automated dependency updates
 
@@ -219,8 +247,11 @@ The build system automatically applies version properties:
 
 ## Release Process
 
-### 1. Feature Development
+Zenix supports both **automatic** and **manual** release processes to accommodate different development scenarios.
 
+### Automatic Release Process (Recommended)
+
+#### 1. Feature Development & Merge
 ```bash
 # Create feature branch
 git checkout -b feature/new-feature
@@ -230,10 +261,32 @@ git checkout -b feature/new-feature
 
 # Create pull request
 # PR Check workflow validates changes
+
+# Merge to main
+git checkout main
+git merge feature/new-feature
+git push origin main
+# → Auto-release triggered if source code changed
 ```
 
-### 2. Version Update
+#### 2. Release Logic
+The auto-release workflow intelligently determines when to create releases:
 
+- ✅ **Creates release**: Source code, tests, or project files changed
+- ⏭️ **Skips release**: Only documentation changes  
+- 🚫 **Manual skip**: Add `[skip release]` or `[no release]` to commit message
+
+#### 3. Automatic Process
+1. **Change Detection** - Analyzes modified files
+2. **Version Calculation** - Uses `major.minor.build` format with auto-increment
+3. **Release Notes** - Generated from commit history since last release
+4. **Build & Test** - Validates code before release
+5. **Asset Creation** - Cross-platform binaries
+6. **GitHub Release** - Automatic creation with proper tagging
+
+### Manual Release Process
+
+#### 1. Version Update (Optional)
 ```bash
 # Update version for new release
 .\update-version.ps1 -Increment minor
@@ -244,8 +297,14 @@ git commit -m "Bump version to 1.1"
 git push origin main
 ```
 
-### 3. Release Creation
+#### 2. Manual Release Trigger
+**Option A: Workflow Dispatch**
+1. Go to GitHub Actions → "Auto Release"
+2. Click "Run workflow"
+3. Select release type: auto/patch/minor/major
+4. Automatic release creation
 
+**Option B: Tag-based Release**
 ```bash
 # After CI completes, get the build number from artifacts
 # Example: If CI run #45 completed, the version is 1.1.45
@@ -260,6 +319,21 @@ git push origin v1.1.45
 # - Uploads release assets
 ```
 
+### Release Control Options
+
+#### Skip Automatic Release
+```bash
+git commit -m "Update documentation [skip release]"
+# or
+git commit -m "Fix typo [no release]"
+```
+
+#### Force Release for Documentation
+```bash
+# Use manual workflow dispatch to force release
+# even for documentation-only changes
+```
+
 ### Release Artifacts
 
 Each release provides:
@@ -272,34 +346,79 @@ All binaries are self-contained and don't require .NET installation.
 
 ## Development Workflow
 
-### Branch Strategy
+### Branch Strategy with Continuous Deployment
 
 ```
-main         ──●────●────●──  (Production releases)
+main         ──●────●────●──  (Production releases - Auto CD)
               ╱      ╱      ╱
 develop   ──●────●────●────   (Integration branch)
            ╱    ╱    ╱
 feature ──●    ╱    ╱        (Feature branches)
-release    ──●────╱          (Release preparation)
+release    ──●────╱          (Release preparation - Optional)
 ```
 
-### Workflow Steps
+### Continuous Deployment Workflow
 
+#### Standard Development Flow
 1. **Feature Development**
    - Branch from `develop`
-   - Implement feature
+   - Implement feature with tests
    - Create PR to `develop`
    - PR Check validates changes
 
-2. **Integration Testing**
+2. **Integration & Testing**
    - Merge to `develop`
-   - CI pipeline runs full validation
-   - Integration testing
+   - CI pipeline validates integration
+   - Manual testing and validation
 
-3. **Release Preparation**
-   - Update version numbers
-   - Create release branch (optional)
-   - Final testing
+3. **Production Deployment**
+   - Merge `develop` to `main`
+   - **Auto-release triggers automatically**
+   - Cross-platform binaries created
+   - GitHub release published
+
+#### Alternative Workflow (Direct to Main)
+1. **Feature Development**
+   - Branch from `main`
+   - Implement feature with tests
+   - Create PR to `main`
+   - PR Check validates changes
+
+2. **Direct Deployment**
+   - Merge to `main`
+   - **Auto-release triggers immediately**
+   - Production release created
+
+### Workflow Steps Details
+
+#### Continuous Deployment Steps
+1. **Feature Development**
+   - Branch from `develop` (or `main`)
+   - Implement feature with comprehensive tests
+   - Create PR with descriptive commit messages
+   - PR Check validates changes automatically
+
+2. **Code Review & Integration**
+   - Team reviews PR for code quality
+   - Merge to target branch (`develop` or `main`)
+   - CI pipeline validates integration
+
+3. **Automatic Release (Main Branch Only)**
+   - Auto-release analyzes changes
+   - Creates release if source code modified
+   - Generates release notes from commits
+   - Builds and publishes cross-platform binaries
+
+#### Manual Version Control (When Needed)
+1. **Version Bump** (Optional)
+   - Use `.\update-version.ps1 -Increment minor` for feature releases
+   - Use `.\update-version.ps1 -Increment major` for breaking changes
+   - Build number always auto-increments
+
+2. **Manual Release Triggers**
+   - Workflow dispatch for immediate releases
+   - Tag-based releases for specific versions
+   - Emergency releases bypassing normal flow
 
 4. **Release Deployment**
    - Merge to `main`
@@ -311,8 +430,29 @@ release    ──●────╱          (Release preparation)
 | Stage | Check | Action |
 |-------|-------|--------|
 | PR | Build + Test | Block merge if failed |
-| Merge | Full CI | Notification if failed |
-| Release | Security scan | Alert if issues found |
+| Merge to Main | Auto-release + CD | Create release if source changed |
+| Manual Release | Security scan | Alert if issues found |
+| All Releases | Cross-platform build | Ensure compatibility |
+
+### Continuous Deployment Benefits
+
+#### Development Efficiency
+- **Faster Feedback**: Immediate releases for bug fixes and features
+- **Reduced Manual Work**: No manual version tagging or release creation
+- **Consistent Process**: Same release process every time
+- **Lower Risk**: Smaller, more frequent releases
+
+#### Quality Assurance
+- **Automated Testing**: All releases are tested before deployment
+- **Version Consistency**: Automatic version management prevents conflicts
+- **Release Notes**: Comprehensive documentation for every release
+- **Rollback Capability**: Easy to identify and revert problematic releases
+
+#### Team Collaboration
+- **Clear History**: Every change is tracked and documented
+- **Release Visibility**: Team knows what's in each release
+- **Skip Options**: Developers can control when releases happen
+- **Manual Override**: Emergency releases when needed
 
 ## Monitoring and Maintenance
 
