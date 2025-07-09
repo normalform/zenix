@@ -607,9 +607,17 @@ public class Z80InterruptTests
         // Arrange
         var mockInterrupt = new Mock<IZ80Interrupt>();
         var capturedRequests = new List<Z80InterruptRequest>();
+        var requestReceived = new ManualResetEventSlim();
         
         mockInterrupt.Setup(x => x.RequestInterrupt(It.IsAny<Z80InterruptRequest>()))
-                    .Callback<Z80InterruptRequest>(request => capturedRequests.Add(request));
+                    .Callback<Z80InterruptRequest>(request => 
+                    {
+                        capturedRequests.Add(request);
+                        if (capturedRequests.Count >= 3) // We expect 3 interrupts
+                        {
+                            requestReceived.Set();
+                        }
+                    });
         
         using var emulator = new AsyncInterruptEmulator(mockInterrupt.Object);
 
@@ -618,8 +626,9 @@ public class Z80InterruptTests
         emulator.EmulateVdpInterrupt();
         emulator.EmulateSystemReset();
 
-        // Give emulator time to process
-        Thread.Sleep(50);
+        // Wait for all interrupts to be processed (with timeout)
+        var success = requestReceived.Wait(TimeSpan.FromSeconds(2));
+        Assert.True(success, "Timeout waiting for interrupts to be processed");
 
         // Assert
         Assert.Contains(capturedRequests, r => r.Source.Id.Contains("KEYBOARD"));
