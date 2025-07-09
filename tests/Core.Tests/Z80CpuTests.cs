@@ -826,4 +826,59 @@ public class Z80CpuTests
     }
 
     #endregion
+
+    #region Self-Assignment Register Load Tests
+
+    [Fact]
+    public void LD_A_A_SelfAssignment_PreservesValueAndConsumesCycles()
+    {
+        // Arrange
+        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_A_n, 0x99, Z80OpCode.LD_A_A }); // LD A, 99h; LD A, A
+        
+        // Act
+        cpu.Step(); // Load A with 0x99
+        var cyclesBefore = cpu.TotalCycles;
+        cpu.Step(); // LD A, A (self-assignment)
+        var cyclesAfter = cpu.TotalCycles;
+        
+        // Assert
+        Assert.Equal(0x99, cpu.A); // Value should be preserved
+        Assert.Equal((ulong)Z80CycleTiming.LD_r_r, cyclesAfter - cyclesBefore); // Should consume correct cycles
+    }
+
+    [Fact]
+    public void LD_B_B_SelfAssignment_PreservesValueAndConsumesCycles()
+    {
+        // Arrange
+        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_B_n, 0x77, Z80OpCode.LD_B_B }); // LD B, 77h; LD B, B
+        
+        // Act
+        cpu.Step(); // Load B with 0x77
+        var cyclesBefore = cpu.TotalCycles;
+        cpu.Step(); // LD B, B (self-assignment)
+        var cyclesAfter = cpu.TotalCycles;
+        
+        // Assert
+        Assert.Equal(0x77, cpu.B); // Value should be preserved
+        Assert.Equal((ulong)Z80CycleTiming.LD_r_r, cyclesAfter - cyclesBefore); // Should consume correct cycles
+    }
+
+    [Fact]
+    public void LD_C_C_SelfAssignment_PreservesValueAndConsumesCycles()
+    {
+        // Arrange
+        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_C_n, 0x33, Z80OpCode.LD_C_C }); // LD C, 33h; LD C, C
+        
+        // Act
+        cpu.Step(); // Load C with 0x33
+        var cyclesBefore = cpu.TotalCycles;
+        cpu.Step(); // LD C, C (self-assignment)
+        var cyclesAfter = cpu.TotalCycles;
+        
+        // Assert
+        Assert.Equal(0x33, cpu.C); // Value should be preserved
+        Assert.Equal((ulong)Z80CycleTiming.LD_r_r, cyclesAfter - cyclesBefore); // Should consume correct cycles
+    }
+
+    #endregion
 }
