@@ -113,7 +113,7 @@ public class Z80Cpu
                 break;
             
             // 8-bit register to register loads
-            case Z80OpCode.LD_A_A: A = A; cycles = Z80CycleTiming.LD_r_r; break; // LD A, A
+            case Z80OpCode.LD_A_A: cycles = Z80CycleTiming.LD_r_r; break; // LD A, A
             case Z80OpCode.LD_A_B: A = B; cycles = Z80CycleTiming.LD_r_r; break; // LD A, B
             case Z80OpCode.LD_A_C: A = C; cycles = Z80CycleTiming.LD_r_r; break; // LD A, C
             case Z80OpCode.LD_A_D: A = D; cycles = Z80CycleTiming.LD_r_r; break; // LD A, D
