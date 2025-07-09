@@ -17,7 +17,7 @@ public static class Program
         else
         {
             var host = new EmulatorHost();
-            host.RunFrame();
+            host.Step();
             System.Console.WriteLine("Zenix CLI skeleton running.");
             System.Console.WriteLine();
             System.Console.WriteLine("Usage:");
