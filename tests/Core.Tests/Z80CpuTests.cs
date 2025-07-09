@@ -370,6 +370,21 @@ public class Z80CpuTests
         Assert.True((cpu.F & 0x40) != 0);
     }
 
+    [Fact]
+    public void ADD_OverflowSetsZeroFlag()
+    {
+        // Arrange
+        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0xFF, 0xC6, 0x01 }); // LD A, FFh; ADD A, 01h
+
+        // Act
+        cpu.Step(); // Load A
+        cpu.Step(); // Add (result wraps to 0)
+
+        // Assert
+        Assert.Equal(0x00, cpu.A);
+        Assert.True((cpu.F & 0x40) != 0); // Zero flag set
+    }
+
     #endregion
 
     #region Increment/Decrement Tests
