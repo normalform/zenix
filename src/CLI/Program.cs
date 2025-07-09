@@ -62,6 +62,18 @@ public static class Program
             Console.WriteLine("Note: Demo stopped when CPU encountered an unimplemented opcode.");
             Console.WriteLine("This is expected behavior for the current demo scenario.");
         }
+        catch (TaskCanceledException)
+        {
+            Console.WriteLine();
+            Console.WriteLine("=== Demo was canceled ===");
+            Console.WriteLine("The operation was canceled before it could complete.");
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine();
+            Console.WriteLine("=== Demo operation was canceled ===");
+            Console.WriteLine("A cancellation token likely caused this.");
+        }
         catch (Exception ex)
         {
             Console.WriteLine();
