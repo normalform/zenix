@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../tools/Z80DebugServer/Z80DebugServer.csproj" />
+    <ProjectReference Include="../src/Zenix.csproj" />
+  </ItemGroup>
+
+</Project>
