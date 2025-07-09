@@ -430,9 +430,9 @@ public class Z80Cpu
     private void AddToA(byte value)
     {
         int result = A + value;
-        SetZeroFlag(result == 0);
-        SetCarryFlag(result > 255);
-        A = (byte)(result & Z80OpCode.BYTE_MASK);
+        SetZeroFlag((result & 0xFF) == 0);
+        SetCarryFlag(result > 0xFF);
+        A = (byte)result;
     }
     
     private byte IncByte(byte value)
