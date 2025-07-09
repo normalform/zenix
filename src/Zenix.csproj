@@ -18,4 +18,8 @@
     <AssemblyCopyright>Copyright © $(Year)</AssemblyCopyright>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="../Demos/**/*.cs" />
+  </ItemGroup>
+
 </Project>

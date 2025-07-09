@@ -43,7 +43,8 @@ dotnet run --project src/Zenix --rom path/to/game.rom --model MSX2+
 
 ## 📚 Project Documentation
 
-All core documents are located in the [`/docs/project`](docs/project) folder:
+### High-Level Documentation
+All core project documents are located in the [`/docs/project`](docs/project) folder:
 
 1. [📘 Introduction](docs/project/01_introduction.md)
 2. [📋 Use Case Analysis](docs/project/02_usecase_analysis.md)
@@ -55,6 +56,13 @@ All core documents are located in the [`/docs/project`](docs/project) folder:
 8. [🔗 Traceability Matrix](docs/project/08_traceability_matrix.md)
 9. [🧠 FPGA Protocol](docs/project/09_fpga_protocol.md)
 10. [📖 Glossary](docs/project/10_glossary.md)
+
+### Detailed Design Documentation
+Comprehensive component design specifications are in [`/docs/design`](docs/design):
+
+- [🏗️ Design Index](docs/design/README.md) - Navigation and overview
+- [🧮 Z80 CPU Core](docs/design/Core/Z80Cpu.md) - Complete CPU implementation details
+- Additional component designs (planned)
 
 ---
 

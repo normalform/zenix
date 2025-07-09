@@ -16,10 +16,14 @@ Zenix is built with a strong separation of concerns using Onion Architecture. Co
 
 - **Class:** `Z80Cpu`
 - **Responsibilities:**
-  - Executes Z80 instructions cycle-accurately
+  - Executes Z80 instructions cycle-accurately with precise timing constants
+  - Maintains a 64-bit cycle counter capable of tracking 10+ years of continuous operation at 4MHz
   - Handles interrupt modes (IM 0, 1, 2)
   - Emits trace spans for telemetry if enabled
+  - Provides emulated time calculation and effective frequency monitoring
 - **Dependencies:** Memory interface, interrupt controller
+- **Cycle Accuracy:** Each instruction consumes the exact number of cycles as specified in the Z80 technical documentation, enabling precise timing for MSX hardware compatibility
+- **Detailed Design:** See [Z80 CPU Core Design](../design/Core/Z80Cpu.md) for comprehensive implementation details
 
 ---
 
@@ -90,6 +94,36 @@ Zenix is built with a strong separation of concerns using Onion Architecture. Co
 
 ---
 
+## ⏱️ Timing and Performance
+
+### Cycle-Accurate Emulation
+
+The Zenix emulator implements cycle-accurate Z80 CPU emulation with the following characteristics:
+
+- **Precision:** Each instruction consumes exactly the same number of cycles as the real Z80 hardware
+- **Long-term Accuracy:** Uses a 64-bit cycle counter that can accurately track over 146,000 years of continuous operation at 4MHz
+- **Performance Monitoring:** Provides real-time effective frequency calculation and emulated time tracking
+- **MSX Compatibility:** Precise timing ensures accurate emulation of MSX hardware timing dependencies
+
+### Timing Constants
+
+All instruction timing is defined in `Z80CycleTiming.cs` with constants based on official Z80 documentation:
+
+- **Basic Operations:** NOP (4 cycles), HALT (4 cycles)
+- **Load Instructions:** Immediate loads (7 cycles), register-to-register (4 cycles)
+- **Arithmetic:** Register operations (4 cycles), immediate operations (7 cycles)
+- **Jumps:** Conditional jumps (7-12 cycles depending on condition)
+- **Stack Operations:** PUSH (11 cycles), POP (10 cycles)
+
+### 10-Year Operation Capability
+
+At 4MHz operation:
+- **1 year:** ~126 trillion cycles
+- **10 years:** ~1.26 quadrillion cycles
+- **Safety margin:** 99.99% of uint64 capacity remaining
+
+---
+
 ## 🧪 Testability
 
 - Each component has:
@@ -118,5 +152,11 @@ src/
 ├── CLI/               # CLI frontend
 └── Web/               # Blazor WebAssembly frontend
 tests/                 # xUnit test projects
+Demos/                 # Demonstration programs and examples
+docs/
+├── project/           # High-level project documentation
+└── design/            # Detailed component design specifications
+    └── Core/          # Core emulation component designs
+        └── Z80Cpu.md  # Z80 CPU detailed design document
 ```
 

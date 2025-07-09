@@ -50,3 +50,29 @@ This document provides links to official datasheets, standards, and emulator ref
 - [MSX Resource Center](https://www.msx.org/)
 - [MSX Assembly Page](http://map.grauw.nl/)
 
+---
+
+## 📖 Project Documentation
+
+### Internal Documentation Structure
+
+The Zenix project maintains comprehensive documentation in two main categories:
+
+#### High-Level Documentation (`/docs/project/`)
+- Project overview, requirements, and architecture
+- Suitable for stakeholders, project managers, and new contributors
+- Cross-references to detailed specifications
+
+#### Detailed Design Documentation (`/docs/design/`)
+- Component-specific implementation details
+- Technical specifications and API documentation  
+- Developer-focused with code examples and performance data
+
+### Quick Access Links
+
+- **[Documentation Quick Reference](QuickReference.md)** - Navigation guide for all documentation
+- **[Design Documentation Index](design/README.md)** - Detailed component specifications
+- **[Z80 CPU Design](design/Core/Z80Cpu.md)** - Complete CPU implementation details
+
+---
+
