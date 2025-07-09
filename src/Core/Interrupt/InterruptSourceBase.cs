@@ -44,7 +44,9 @@ public abstract class InterruptSourceBase
     public override bool Equals(object? obj)
     {
         if (obj == null || obj.GetType() != GetType())
+        {
             return false;
+        }
 
         var other = (InterruptSourceBase)obj;
         return Id == other.Id;
