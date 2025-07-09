@@ -6,7 +6,7 @@ This document provides detailed design specifications for the Z80 CPU emulation 
 
 ## 📋 Overview
 
-The Z80 CPU core (`Z80Cpu`) is the heart of the Zenix emulator, providing cycle-accurate emulation of the Zilog Z80 microprocessor as used in MSX computers. The implementation focuses on timing precision, maintainability, and comprehensive instruction support.
+The Z80 CPU core (`Z80Cpu`) is the heart of the Zenix emulator, providing cycle-accurate emulation of the Zilog Z80 microprocessor as used in MSX computers. The implementation focuses on timing precision, maintainability, and currently covers a subset of instructions, with more support planned.
 
 ---
 
@@ -414,7 +414,7 @@ All tests follow the Arrange-Act-Assert (AAA) pattern:
 public void InstructionName_ExpectedBehavior()
 {
     // Arrange
-    var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.INSTRUCTION });
+    var cpu = CreateCpuWithMemory([Z80OpCode.INSTRUCTION]);
     
     // Act
     cpu.Step();
@@ -480,7 +480,7 @@ Based on demonstration runs:
 |---------|------|---------|
 | 1.0 | 2025-07-08 | Initial implementation with cycle-accurate timing |
 | | | 64-bit cycle counter for 10+ year operation |
-| | | Comprehensive instruction set coverage |
+| | | Initial subset of the instruction set implemented; further coverage planned |
 | | | Complete unit test suite (47 tests) |
 
 ---

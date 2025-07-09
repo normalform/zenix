@@ -11,6 +11,39 @@ public class Z80Cpu
     private readonly IZ80Interrupt _interrupt;
     public Z80CpuOptions Options { get; }
 
+    // Register storage accessible for debug tools
+    public class Z80Registers
+    {
+        public byte A;
+        public byte F;
+        public byte B;
+        public byte C;
+        public byte D;
+        public byte E;
+        public byte H;
+        public byte L;
+        public ushort SP;
+        public ushort PC;
+    }
+
+    /// <summary>
+    /// Public instance exposing the current register values. External tools can
+    /// inspect or modify the registers directly for debugging purposes.
+    /// </summary>
+    public Z80Registers Registers { get; } = new();
+
+    /// <summary>
+    /// Hook invoked whenever a byte is read from memory. The ushort parameter is
+    /// the address and the byte parameter is the value returned.
+    /// </summary>
+    public Action<ushort, byte>? MemoryReadHook;
+
+    /// <summary>
+    /// Hook invoked whenever a byte is written to memory. The ushort parameter
+    /// is the address written and the byte parameter is the value stored.
+    /// </summary>
+    public Action<ushort, byte>? MemoryWriteHook;
+
     // Cycle-accurate timing state
     private ulong _totalCycles = 0;
     private DateTime _emulationStartTime = DateTime.UtcNow;
@@ -24,16 +57,16 @@ public class Z80Cpu
         Reset();
     }
 
-    public byte A { get; private set; }
-    public byte F { get; private set; }
-    public byte B { get; private set; }
-    public byte C { get; private set; }
-    public byte D { get; private set; }
-    public byte E { get; private set; }
-    public byte H { get; private set; }
-    public byte L { get; private set; }
-    public ushort SP { get; private set; }
-    public ushort PC { get; private set; }
+    public byte A { get => Registers.A; private set => Registers.A = value; }
+    public byte F { get => Registers.F; private set => Registers.F = value; }
+    public byte B { get => Registers.B; private set => Registers.B = value; }
+    public byte C { get => Registers.C; private set => Registers.C = value; }
+    public byte D { get => Registers.D; private set => Registers.D = value; }
+    public byte E { get => Registers.E; private set => Registers.E = value; }
+    public byte H { get => Registers.H; private set => Registers.H = value; }
+    public byte L { get => Registers.L; private set => Registers.L = value; }
+    public ushort SP { get => Registers.SP; private set => Registers.SP = value; }
+    public ushort PC { get => Registers.PC; private set => Registers.PC = value; }
     public bool Halted { get; private set; }
 
     /// <summary>
@@ -55,15 +88,19 @@ public class Z80Cpu
         get
         {
             var elapsed = DateTime.UtcNow - _emulationStartTime;
-            if (elapsed.TotalSeconds < 0.001) return 0.0;
+            if (elapsed.TotalSeconds < 0.001)
+            {
+                return 0.0;
+            }
             return _totalCycles / elapsed.TotalSeconds;
         }
     }
 
     /// <summary>
-    /// Emulated time elapsed in seconds based on cycle count at 4MHz.
+    /// Emulated time elapsed in seconds based on cycle count and configured clock frequency.
     /// </summary>
-    public double EmulatedTimeSeconds => (double)_totalCycles / Z80CycleTiming.CLOCK_FREQUENCY_HZ;
+    public double EmulatedTimeSeconds =>
+        _totalCycles / (Options.ClockMHz * 1_000_000.0);
 
     public void Reset()
     {
@@ -94,7 +131,7 @@ public class Z80Cpu
             return;
         }
 
-        byte opcode = _memory.ReadByte(PC++);
+        byte opcode = ReadByte(PC++);
         byte cycles = 0;
 
         switch (opcode)
@@ -104,31 +141,31 @@ public class Z80Cpu
                 cycles = Z80CycleTiming.NOP;
                 break;
             case Z80OpCode.LD_A_n: // LD A, n
-                A = _memory.ReadByte(PC++);
+                A = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_r_n;
                 break;
             case Z80OpCode.LD_B_n: // LD B, n
-                B = _memory.ReadByte(PC++);
+                B = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_r_n;
                 break;
             case Z80OpCode.LD_C_n: // LD C, n
-                C = _memory.ReadByte(PC++);
+                C = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_r_n;
                 break;
             case Z80OpCode.LD_D_n: // LD D, n
-                D = _memory.ReadByte(PC++);
+                D = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_r_n;
                 break;
             case Z80OpCode.LD_E_n: // LD E, n
-                E = _memory.ReadByte(PC++);
+                E = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_r_n;
                 break;
             case Z80OpCode.LD_H_n: // LD H, n
-                H = _memory.ReadByte(PC++);
+                H = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_r_n;
                 break;
             case Z80OpCode.LD_L_n: // LD L, n
-                L = _memory.ReadByte(PC++);
+                L = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_r_n;
                 break;
             
@@ -159,48 +196,48 @@ public class Z80Cpu
             
             // 16-bit Load instructions
             case Z80OpCode.LD_BC_nn: // LD BC, nn
-                C = _memory.ReadByte(PC++);
-                B = _memory.ReadByte(PC++);
+                C = ReadByte(PC++);
+                B = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_dd_nn;
                 break;
             case Z80OpCode.LD_DE_nn: // LD DE, nn
-                E = _memory.ReadByte(PC++);
-                D = _memory.ReadByte(PC++);
+                E = ReadByte(PC++);
+                D = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_dd_nn;
                 break;
             case Z80OpCode.LD_HL_nn: // LD HL, nn
-                L = _memory.ReadByte(PC++);
-                H = _memory.ReadByte(PC++);
+                L = ReadByte(PC++);
+                H = ReadByte(PC++);
                 cycles = Z80CycleTiming.LD_dd_nn;
                 break;
             case Z80OpCode.LD_SP_nn: // LD SP, nn
-                ushort spLow = _memory.ReadByte(PC++);
-                ushort spHigh = _memory.ReadByte(PC++);
+                ushort spLow = ReadByte(PC++);
+                ushort spHigh = ReadByte(PC++);
                 SP = (ushort)(spLow | (spHigh << 8));
                 cycles = Z80CycleTiming.LD_dd_nn;
                 break;
             
             // Memory operations
             case Z80OpCode.LD_nn_A: // LD (nn), A
-                ushort addrLow = _memory.ReadByte(PC++);
-                ushort addrHigh = _memory.ReadByte(PC++);
+                ushort addrLow = ReadByte(PC++);
+                ushort addrHigh = ReadByte(PC++);
                 ushort addr = (ushort)(addrLow | (addrHigh << 8));
-                _memory.WriteByte(addr, A);
+                WriteByte(addr, A);
                 cycles = Z80CycleTiming.LD_nn_A;
                 break;
             case Z80OpCode.LD_A_nn: // LD A, (nn)
-                ushort loadAddrLow = _memory.ReadByte(PC++);
-                ushort loadAddrHigh = _memory.ReadByte(PC++);
+                ushort loadAddrLow = ReadByte(PC++);
+                ushort loadAddrHigh = ReadByte(PC++);
                 ushort loadAddr = (ushort)(loadAddrLow | (loadAddrHigh << 8));
-                A = _memory.ReadByte(loadAddr);
+                A = ReadByte(loadAddr);
                 cycles = Z80CycleTiming.LD_A_nn;
                 break;
             case Z80OpCode.LD_HL_A: // LD (HL), A
-                _memory.WriteByte(GetHL(), A);
+                WriteByte(GetHL(), A);
                 cycles = Z80CycleTiming.LD_HL_r;
                 break;
             case Z80OpCode.LD_A_HL: // LD A, (HL)
-                A = _memory.ReadByte(GetHL());
+                A = ReadByte(GetHL());
                 cycles = Z80CycleTiming.LD_r_HL;
                 break;
             
@@ -234,7 +271,7 @@ public class Z80Cpu
                 cycles = Z80CycleTiming.ADD_A_r;
                 break;
             case Z80OpCode.ADD_A_n: // ADD A, n
-                AddToA(_memory.ReadByte(PC++));
+                AddToA(ReadByte(PC++));
                 cycles = Z80CycleTiming.ADD_A_n;
                 break;
             
@@ -299,18 +336,18 @@ public class Z80Cpu
             
             // Jump instructions
             case Z80OpCode.JP_nn: // JP nn
-                ushort low = _memory.ReadByte(PC++);
-                ushort high = _memory.ReadByte(PC++);
+                ushort low = ReadByte(PC++);
+                ushort high = ReadByte(PC++);
                 PC = (ushort)(low | (high << 8));
                 cycles = Z80CycleTiming.JP_nn;
                 break;
             case Z80OpCode.JR_e: // JR e (relative jump)
-                sbyte offset = (sbyte)_memory.ReadByte(PC++);
+                sbyte offset = (sbyte)ReadByte(PC++);
                 PC = (ushort)(PC + offset);
                 cycles = Z80CycleTiming.JR_e_taken;
                 break;
             case Z80OpCode.JR_NZ_e: // JR NZ, e
-                sbyte nzOffset = (sbyte)_memory.ReadByte(PC++);
+                sbyte nzOffset = (sbyte)ReadByte(PC++);
                 if (!GetZeroFlag())
                 {
                     PC = (ushort)(PC + nzOffset);
@@ -322,7 +359,7 @@ public class Z80Cpu
                 }
                 break;
             case Z80OpCode.JR_Z_e: // JR Z, e
-                sbyte zOffset = (sbyte)_memory.ReadByte(PC++);
+                sbyte zOffset = (sbyte)ReadByte(PC++);
                 if (GetZeroFlag())
                 {
                     PC = (ushort)(PC + zOffset);
@@ -537,9 +574,9 @@ public class Z80Cpu
     private void AddToA(byte value)
     {
         int result = A + value;
-        SetZeroFlag(result == 0);
-        SetCarryFlag(result > 255);
-        A = (byte)(result & Z80OpCode.BYTE_MASK);
+        SetZeroFlag((result & 0xFF) == 0);
+        SetCarryFlag(result > 0xFF);
+        A = (byte)result;
     }
     
     private byte IncByte(byte value)
@@ -555,18 +592,32 @@ public class Z80Cpu
         SetZeroFlag(result == 0);
         return result;
     }
+
+    // Memory access wrappers that invoke debug hooks
+    private byte ReadByte(ushort address)
+    {
+        var value = _memory.ReadByte(address);
+        MemoryReadHook?.Invoke(address, value);
+        return value;
+    }
+
+    private void WriteByte(ushort address, byte value)
+    {
+        _memory.WriteByte(address, value);
+        MemoryWriteHook?.Invoke(address, value);
+    }
     
     // Stack operations
     private void PushWord(ushort value)
     {
-        _memory.WriteByte(--SP, (byte)(value >> 8));
-        _memory.WriteByte(--SP, (byte)(value & Z80OpCode.BYTE_MASK));
+        WriteByte(--SP, (byte)(value >> 8));
+        WriteByte(--SP, (byte)(value & Z80OpCode.BYTE_MASK));
     }
     
     private ushort PopWord()
     {
-        byte low = _memory.ReadByte(SP++);
-        byte high = _memory.ReadByte(SP++);
+        byte low = ReadByte(SP++);
+        byte high = ReadByte(SP++);
         return (ushort)((high << 8) | low);
     }
     
@@ -577,16 +628,24 @@ public class Z80Cpu
     private void SetZeroFlag(bool value)
     {
         if (value)
+        {
             F |= Z80OpCode.FLAG_ZERO;
+        }
         else
+        {
             F &= Z80OpCode.FLAG_ZERO_MASK;
+        }
     }
     
     private void SetCarryFlag(bool value)
     {
         if (value)
+        {
             F |= Z80OpCode.FLAG_CARRY;
+        }
         else
+        {
             F &= Z80OpCode.FLAG_CARRY_MASK;
+        }
     }
 }

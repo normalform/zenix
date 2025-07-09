@@ -209,12 +209,12 @@ public static class InterruptEmulationDemo
         memory.WriteByte(0x1000, Z80OpCode.EI);     // Re-enable interrupts
         memory.WriteByte(0x1001, Z80OpCode.RETI);   // Return from interrupt
 
-        var program = new byte[]
-        {
+        byte[] program =
+        [
             Z80OpCode.EI,           // Enable interrupts
             Z80OpCode.NOP,          // EI delay
             Z80OpCode.HALT,         // HALT
-        };
+        ];
         memory.LoadRom(program);
 
         Console.WriteLine("Using custom interrupt controller with IM2...");

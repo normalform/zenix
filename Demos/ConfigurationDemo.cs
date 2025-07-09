@@ -3,7 +3,6 @@
 
 using Zenix.App;
 using Zenix.App.Configuration;
-using Zenix.Core;
 
 namespace Zenix.Demos;
 

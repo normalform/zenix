@@ -70,7 +70,10 @@ public class AsyncInterruptEmulator : IDisposable
         InterruptSourceBase source,
         string? description = null)
     {
-        if (_disposed) return;
+        if (_disposed)
+        {
+            return;
+        }
 
         var request = new InterruptEmulationRequest(
             new Z80InterruptRequest(Z80InterruptType.Maskable, vector, priority, source),
@@ -108,7 +111,10 @@ public class AsyncInterruptEmulator : IDisposable
         InterruptSourceBase source,
         string? description = null)
     {
-        if (_disposed) return;
+        if (_disposed)
+        {
+            return;
+        }
 
         var request = new InterruptEmulationRequest(
             new Z80InterruptRequest(Z80InterruptType.NonMaskable, 0, 0, source),
@@ -148,7 +154,10 @@ public class AsyncInterruptEmulator : IDisposable
         InterruptSourceBase source,
         string? description = null)
     {
-        if (_disposed) return;
+        if (_disposed)
+        {
+            return;
+        }
 
         var request = new InterruptEmulationRequest(
             new Z80InterruptRequest(Z80InterruptType.Maskable, vector, priority, source),

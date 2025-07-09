@@ -25,6 +25,16 @@ Thank you for your interest in contributing to the Zenix MSX emulator project! W
 
 ## 📋 Development Guidelines
 
+### Build Requirements
+- **Strict Build Rules**: All warnings are treated as errors for maximum code quality
+- **Code Analysis**: Static analysis is enabled and enforced on all builds
+- **IDE Rules**: Specific rules are enforced including:
+  - **IDE0130**: Namespace must match folder structure (error)
+  - **IDE0300**: Use collection expressions (error)  
+  - **IDE0161**: Use file-scoped namespaces (error)
+  - **IDE0011**: Add braces to if statements (error)
+  - **IDE0005**: Remove unnecessary using directives (error)
+
 ### Code Standards
 - **Follow the [coding guidelines](docs/coding-guidelines.md)** - comprehensive standards for C#, naming, and architecture
 - **IDE0130 compliance**: Namespaces must match folder structure exactly (enforced and verified)
@@ -32,6 +42,7 @@ Thank you for your interest in contributing to the Zenix MSX emulator project! W
 - **Apply functional programming principles** where appropriate
 - **One class per file** with file names matching class names
 - **File-scoped namespaces** for all new code
+- **Collection expressions**: Use `[...]` instead of `new Type[] { ... }` (IDE0300)
 - **Comprehensive unit tests** for all new functionality
 
 ### Architecture Principles
@@ -60,6 +71,20 @@ Zenix.Tests.Core.Tests        # Unit tests
 - **Follow the Arrange-Act-Assert pattern**
 - **Use meaningful test names** that describe the scenario
 - **Maintain test coverage** for critical components
+
+### Build Configuration
+
+The project uses several configuration files to enforce quality and consistency:
+
+- **`Directory.Build.props`**: MSBuild properties shared across all projects
+  - Enforces treat warnings as errors
+  - Sets common package versions for test projects
+  - Configures code analysis and documentation generation
+  
+- **`.editorconfig`**: Code style rules for VS Code and Visual Studio
+  - Enforces consistent formatting
+  - Configures naming conventions
+  - Sets indentation and line ending preferences
 
 ## 📝 Documentation
 

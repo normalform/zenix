@@ -1,7 +1,6 @@
 // Copyright (c) 2025 Zenix Project
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-using System.Threading;
 using Moq;
 using Xunit;
 using Zenix.Core;
@@ -766,7 +765,7 @@ public class Z80InterruptTests
     public void CPU_ExecutesInterruptInstructions()
     {
         // Test that CPU can execute interrupt-related opcodes
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.EI, Z80OpCode.DI });
+        var cpu = CreateCpuWithMemory([Z80OpCode.EI, Z80OpCode.DI]);
         
         // Act
         cpu.Step(); // EI
@@ -780,7 +779,7 @@ public class Z80InterruptTests
     public void CPU_HandlesInterruptDuringExecution()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.EI, Z80OpCode.NOP, Z80OpCode.NOP });
+        var cpu = CreateCpuWithMemory([Z80OpCode.EI, Z80OpCode.NOP, Z80OpCode.NOP]);
         cpu.Interrupt.SetInterruptMode(Z80InterruptMode.Mode1);
         cpu.Step(); // EI
         cpu.Step(); // NOP (EI delay)
@@ -801,7 +800,7 @@ public class Z80InterruptTests
     public void CPU_HALTWakesUpOnInterrupt()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.EI, Z80OpCode.HALT });
+        var cpu = CreateCpuWithMemory([Z80OpCode.EI, Z80OpCode.HALT]);
         cpu.Step(); // EI
         cpu.Step(); // HALT
         Assert.True(cpu.Halted);
@@ -860,7 +859,7 @@ public class Z80InterruptTests
                         return false;
                     });
         
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.EI, Z80OpCode.NOP }, mockInterrupt.Object);
+        var cpu = CreateCpuWithMemory([Z80OpCode.EI, Z80OpCode.NOP], mockInterrupt.Object);
 
         // Act
         cpu.Step(); // EI

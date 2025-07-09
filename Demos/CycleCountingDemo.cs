@@ -1,7 +1,6 @@
 // Copyright (c) 2025 Zenix Project
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-using System;
 using Zenix.App;
 using Zenix.Core;
 
@@ -85,13 +84,13 @@ public class CycleCountingDemo
             var memory = compositionRoot.GetService<Z80MemoryMap>();
 
             // Load a simple program
-            var program = new byte[]
-            {
+            byte[] program =
+            [
                 Z80OpCode.NOP,          // 4 cycles
                 Z80OpCode.LD_A_n, 0x42, // 7 cycles  
                 Z80OpCode.NOP,          // 4 cycles
                 Z80OpCode.HALT          // 4 cycles
-            };
+            ];
             
             memory.LoadRom(program);
 
@@ -145,7 +144,7 @@ public class CycleCountingDemo
             Console.WriteLine();
             
             // Test with a reasonable simulation
-            var program = new byte[] { Z80OpCode.NOP }; // Single instruction program
+            byte[] program = [Z80OpCode.NOP]; // Single instruction program
             memory.LoadRom(program);
             
             const int iterations = 100000; // 100,000 instructions

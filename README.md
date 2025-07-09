@@ -23,6 +23,8 @@ It is built in **C# with .NET 8**, featuring clean architecture, full observabil
 - 🧪 Designed for testability, extensibility, and learning
 - ⚙️ Optional hardware offload via USB-C (FPGA + ESP32) — modular and non-required
 
+> **Note:** The Z80 CPU currently implements only a subset of instructions. Additional coverage is planned.
+
 ---
 
 ## 🚀 Getting Started
@@ -66,6 +68,14 @@ dotnet test tests/Zenix.Tests.csproj
 - Floppy disk controller (WD2793)
 - WebAssembly frontend (Blazor WASM)
 
+## 🐞 Debugging in VSCode
+
+1. Ensure the repo is opened in VSCode.
+2. Press **F5** to launch using the `.NET Core Launch` profile from `.vscode/launch.json`.
+3. Set breakpoints in files such as `src/App/EmulatorHost.cs` by clicking the gutter.
+4. While debugging, watch the `Registers` object and variables in the **Variables** pane.
+5. The debug monitor prints register and memory state after each CPU step.
+
 ---
 
 ## 📚 Project Documentation
@@ -88,7 +98,7 @@ All core project documents are located in the [`/docs/project`](docs/project) fo
 Comprehensive component design specifications are in [`/docs/design`](docs/design):
 
 - [🏗️ Design Index](docs/design/README.md) - Navigation and overview
-- [🧮 Z80 CPU Core](docs/design/Core/Z80Cpu.md) - Complete CPU implementation details
+- [🧮 Z80 CPU Core](docs/design/Core/Z80Cpu.md) - CPU implementation details (partial instruction coverage)
 - Additional component designs (planned)
 
 ---

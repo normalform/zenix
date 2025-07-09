@@ -50,5 +50,5 @@ CodeCoverage/
 
 # NUnit
 *.VisualState.xml
-TestResult.xml
-nunit-*.xml
+TestResult.xmlnunit-*.xml
+packages-microsoft-prod.deb

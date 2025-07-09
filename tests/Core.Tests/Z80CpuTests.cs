@@ -29,7 +29,7 @@ public class Z80CpuTests
     public void NOP_DoesNothing()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.NOP }); // NOP
+        var cpu = CreateCpuWithMemory([Z80OpCode.NOP]); // NOP
         var initialPC = cpu.PC;
         
         // Act
@@ -43,7 +43,7 @@ public class Z80CpuTests
     public void HALT_StopsExecution()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.HALT }); // HALT
+        var cpu = CreateCpuWithMemory([Z80OpCode.HALT]); // HALT
         
         // Act
         cpu.Step();
@@ -60,7 +60,7 @@ public class Z80CpuTests
     public void LD_A_n_LoadsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_A_n, 0x42 }); // LD A, 42h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_A_n, 0x42]); // LD A, 42h
         
         // Act
         cpu.Step();
@@ -73,7 +73,7 @@ public class Z80CpuTests
     public void LD_B_n_LoadsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_B_n, 0x33 }); // LD B, 33h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_B_n, 0x33]); // LD B, 33h
         
         // Act
         cpu.Step();
@@ -86,7 +86,7 @@ public class Z80CpuTests
     public void LD_C_n_LoadsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_C_n, 0x44 }); // LD C, 44h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_C_n, 0x44]); // LD C, 44h
         
         // Act
         cpu.Step();
@@ -99,7 +99,7 @@ public class Z80CpuTests
     public void LD_D_n_LoadsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_D_n, 0x55 }); // LD D, 55h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_D_n, 0x55]); // LD D, 55h
         
         // Act
         cpu.Step();
@@ -112,7 +112,7 @@ public class Z80CpuTests
     public void LD_E_n_LoadsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_E_n, 0x66 }); // LD E, 66h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_E_n, 0x66]); // LD E, 66h
         
         // Act
         cpu.Step();
@@ -125,7 +125,7 @@ public class Z80CpuTests
     public void LD_H_n_LoadsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_H_n, 0x77 }); // LD H, 77h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_H_n, 0x77]); // LD H, 77h
         
         // Act
         cpu.Step();
@@ -138,7 +138,7 @@ public class Z80CpuTests
     public void LD_L_n_LoadsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_L_n, 0x88 }); // LD L, 88h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_L_n, 0x88]); // LD L, 88h
         
         // Act
         cpu.Step();
@@ -155,7 +155,7 @@ public class Z80CpuTests
     public void LD_A_B_CopiesRegister()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_B_n, 0x42, Z80OpCode.LD_A_B }); // LD B, 42h; LD A, B
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_B_n, 0x42, Z80OpCode.LD_A_B]); // LD B, 42h; LD A, B
         
         // Act
         cpu.Step(); // Load B
@@ -170,7 +170,7 @@ public class Z80CpuTests
     public void LD_B_A_CopiesRegister()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_A_n, 0x55, Z80OpCode.LD_B_A }); // LD A, 55h; LD B, A
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_A_n, 0x55, Z80OpCode.LD_B_A]); // LD A, 55h; LD B, A
         
         // Act
         cpu.Step(); // Load A
@@ -185,7 +185,7 @@ public class Z80CpuTests
     public void LD_C_D_CopiesRegister()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_D_n, 0x99, Z80OpCode.LD_C_D }); // LD D, 99h; LD C, D
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_D_n, 0x99, Z80OpCode.LD_C_D]); // LD D, 99h; LD C, D
         
         // Act
         cpu.Step(); // Load D
@@ -204,7 +204,7 @@ public class Z80CpuTests
     public void LD_BC_nn_Loads16Bit()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_BC_nn, 0x34, 0x12 }); // LD BC, 1234h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_BC_nn, 0x34, 0x12]); // LD BC, 1234h
         
         // Act
         cpu.Step();
@@ -218,7 +218,7 @@ public class Z80CpuTests
     public void LD_DE_nn_Loads16Bit()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_DE_nn, 0x78, 0x56 }); // LD DE, 5678h
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_DE_nn, 0x78, 0x56]); // LD DE, 5678h
         
         // Act
         cpu.Step();
@@ -232,7 +232,7 @@ public class Z80CpuTests
     public void LD_HL_nn_Loads16Bit()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_HL_nn, 0xBC, 0x9A }); // LD HL, 9ABCh
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_HL_nn, 0xBC, 0x9A]); // LD HL, 9ABCh
         
         // Act
         cpu.Step();
@@ -246,7 +246,7 @@ public class Z80CpuTests
     public void LD_SP_nn_Loads16Bit()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_SP_nn, 0xEF, 0xCD }); // LD SP, CDEFh
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_SP_nn, 0xEF, 0xCD]); // LD SP, CDEFh
         
         // Act
         cpu.Step();
@@ -315,7 +315,7 @@ public class Z80CpuTests
     public void ADD_A_B_AddsRegisters()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_A_n, 0x10, Z80OpCode.LD_B_n, 0x20, Z80OpCode.ADD_A_B }); // LD A, 10h; LD B, 20h; ADD A, B
+        var cpu = CreateCpuWithMemory([Z80OpCode.LD_A_n, 0x10, Z80OpCode.LD_B_n, 0x20, Z80OpCode.ADD_A_B]); // LD A, 10h; LD B, 20h; ADD A, B
         
         // Act
         cpu.Step(); // Load A
@@ -330,7 +330,7 @@ public class Z80CpuTests
     public void ADD_A_n_AddsImmediate()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x15, 0xC6, 0x25 }); // LD A, 15h; ADD A, 25h
+        var cpu = CreateCpuWithMemory([0x3E, 0x15, 0xC6, 0x25]); // LD A, 15h; ADD A, 25h
         
         // Act
         cpu.Step(); // Load A
@@ -344,7 +344,7 @@ public class Z80CpuTests
     public void ADD_SetsCarryFlag()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0xFF, 0xC6, 0x01 }); // LD A, FFh; ADD A, 01h
+        var cpu = CreateCpuWithMemory([0x3E, 0xFF, 0xC6, 0x01]); // LD A, FFh; ADD A, 01h
         
         // Act
         cpu.Step(); // Load A
@@ -360,7 +360,7 @@ public class Z80CpuTests
     public void ADD_SetsZeroFlag()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x00, 0xC6, 0x00 }); // LD A, 00h; ADD A, 00h
+        var cpu = CreateCpuWithMemory([0x3E, 0x00, 0xC6, 0x00]); // LD A, 00h; ADD A, 00h
         
         // Act
         cpu.Step(); // Load A
@@ -372,6 +372,21 @@ public class Z80CpuTests
         Assert.True((cpu.F & 0x40) != 0);
     }
 
+    [Fact]
+    public void ADD_OverflowSetsZeroFlag()
+    {
+        // Arrange
+        var cpu = CreateCpuWithMemory([0x3E, 0xFF, 0xC6, 0x01]); // LD A, FFh; ADD A, 01h
+
+        // Act
+        cpu.Step(); // Load A
+        cpu.Step(); // Add (result wraps to 0)
+
+        // Assert
+        Assert.Equal(0x00, cpu.A);
+        Assert.True((cpu.F & 0x40) != 0); // Zero flag set
+    }
+
     #endregion
 
     #region Increment/Decrement Tests
@@ -380,7 +395,7 @@ public class Z80CpuTests
     public void INC_A_IncrementsRegister()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x42, 0x3C }); // LD A, 42h; INC A
+        var cpu = CreateCpuWithMemory([0x3E, 0x42, 0x3C]); // LD A, 42h; INC A
         
         // Act
         cpu.Step(); // Load A
@@ -394,7 +409,7 @@ public class Z80CpuTests
     public void INC_SetsZeroFlag()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0xFF, 0x3C }); // LD A, FFh; INC A
+        var cpu = CreateCpuWithMemory([0x3E, 0xFF, 0x3C]); // LD A, FFh; INC A
         
         // Act
         cpu.Step(); // Load A
@@ -409,7 +424,7 @@ public class Z80CpuTests
     public void DEC_A_DecrementsRegister()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x42, 0x3D }); // LD A, 42h; DEC A
+        var cpu = CreateCpuWithMemory([0x3E, 0x42, 0x3D]); // LD A, 42h; DEC A
         
         // Act
         cpu.Step(); // Load A
@@ -423,7 +438,7 @@ public class Z80CpuTests
     public void DEC_SetsZeroFlag()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x01, 0x3D }); // LD A, 01h; DEC A
+        var cpu = CreateCpuWithMemory([0x3E, 0x01, 0x3D]); // LD A, 01h; DEC A
         
         // Act
         cpu.Step(); // Load A
@@ -442,7 +457,7 @@ public class Z80CpuTests
     public void JP_nn_JumpsAbsolute()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0xC3, 0x00, 0x02, 0x00, 0x00 }); // JP 0200h
+        var cpu = CreateCpuWithMemory([ 0xC3, 0x00, 0x02, 0x00, 0x00 ]); // JP 0200h
         
         // Act
         cpu.Step();
@@ -455,7 +470,7 @@ public class Z80CpuTests
     public void JR_e_JumpsRelative()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x18, 0x05 }); // JR +5
+        var cpu = CreateCpuWithMemory([ 0x18, 0x05 ]); // JR +5
         var initialPC = cpu.PC;
         
         // Act
@@ -469,7 +484,7 @@ public class Z80CpuTests
     public void JR_Z_JumpsWhenZeroFlagSet()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x00, 0x87, 0x28, 0x05 }); // LD A, 0; ADD A, A; JR Z, +5
+        var cpu = CreateCpuWithMemory([ 0x3E, 0x00, 0x87, 0x28, 0x05 ]); // LD A, 0; ADD A, A; JR Z, +5
         
         // Act
         cpu.Step(); // Load A
@@ -485,7 +500,7 @@ public class Z80CpuTests
     public void JR_Z_DoesNotJumpWhenZeroFlagClear()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x01, 0x87, 0x28, 0x05 }); // LD A, 1; ADD A, A; JR Z, +5
+        var cpu = CreateCpuWithMemory([ 0x3E, 0x01, 0x87, 0x28, 0x05 ]); // LD A, 1; ADD A, A; JR Z, +5
         
         // Act
         cpu.Step(); // Load A
@@ -501,7 +516,7 @@ public class Z80CpuTests
     public void JR_NZ_JumpsWhenZeroFlagClear()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0x01, 0x87, 0x20, 0x05 }); // LD A, 1; ADD A, A; JR NZ, +5
+        var cpu = CreateCpuWithMemory([ 0x3E, 0x01, 0x87, 0x20, 0x05 ]); // LD A, 1; ADD A, A; JR NZ, +5
         
         // Act
         cpu.Step(); // Load A
@@ -521,7 +536,7 @@ public class Z80CpuTests
     public void PUSH_POP_BC_WorksCorrectly()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x01, 0x34, 0x12, 0xC5, 0x01, 0x00, 0x00, 0xC1 }); 
+        var cpu = CreateCpuWithMemory([ 0x01, 0x34, 0x12, 0xC5, 0x01, 0x00, 0x00, 0xC1 ]); 
         // LD BC, 1234h; PUSH BC; LD BC, 0000h; POP BC
         
         // Act
@@ -539,7 +554,7 @@ public class Z80CpuTests
     public void PUSH_POP_DE_WorksCorrectly()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x11, 0x78, 0x56, 0xD5, 0x11, 0x00, 0x00, 0xD1 }); 
+        var cpu = CreateCpuWithMemory([ 0x11, 0x78, 0x56, 0xD5, 0x11, 0x00, 0x00, 0xD1 ]); 
         // LD DE, 5678h; PUSH DE; LD DE, 0000h; POP DE
         
         // Act
@@ -557,7 +572,7 @@ public class Z80CpuTests
     public void PUSH_POP_HL_WorksCorrectly()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x21, 0xBC, 0x9A, 0xE5, 0x21, 0x00, 0x00, 0xE1 }); 
+        var cpu = CreateCpuWithMemory([ 0x21, 0xBC, 0x9A, 0xE5, 0x21, 0x00, 0x00, 0xE1 ]); 
         // LD HL, 9ABCh; PUSH HL; LD HL, 0000h; POP HL
         
         // Act
@@ -575,7 +590,7 @@ public class Z80CpuTests
     public void PUSH_POP_AF_WorksCorrectly()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 0x3E, 0xAA, 0xF5, 0x3E, 0x00, 0xF1 }); 
+        var cpu = CreateCpuWithMemory([ 0x3E, 0xAA, 0xF5, 0x3E, 0x00, 0xF1 ]); 
         // LD A, AAh; PUSH AF; LD A, 00h; POP AF
         
         // Act
@@ -599,14 +614,14 @@ public class Z80CpuTests
     {
         // Arrange
         // A simple program that loads values, adds them, and stores result
-        var program = new byte[] {
+        byte[] program = [
             0x3E, 0x10,       // LD A, 10h
             0x06, 0x20,       // LD B, 20h
             0x80,             // ADD A, B (A = 30h)
             0x21, 0x00, 0x02, // LD HL, 0200h
             0x77,             // LD (HL), A
             0x76              // HALT
-        };
+        ];
         
         var cpu = CreateCpuWithMemory(program);
         
@@ -673,7 +688,7 @@ public class Z80CpuTests
     public void NOP_ConsumesCorrectCycles()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.NOP });
+        var cpu = CreateCpuWithMemory([ Z80OpCode.NOP ]);
         
         // Act
         cpu.Step();
@@ -686,7 +701,7 @@ public class Z80CpuTests
     public void HALT_ConsumesCorrectCycles()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.HALT });
+        var cpu = CreateCpuWithMemory([ Z80OpCode.HALT ]);
         
         // Act
         cpu.Step();
@@ -703,7 +718,7 @@ public class Z80CpuTests
     public void LoadImmediate_ConsumesCorrectCycles()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_A_n, 0x42 });
+        var cpu = CreateCpuWithMemory([ Z80OpCode.LD_A_n, 0x42 ]);
         
         // Act
         cpu.Step();
@@ -717,11 +732,11 @@ public class Z80CpuTests
     public void MultipleInstructions_AccumulateCycles()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { 
+        var cpu = CreateCpuWithMemory([
             Z80OpCode.NOP,          // 4 cycles
             Z80OpCode.LD_A_n, 0x42, // 7 cycles
             Z80OpCode.NOP           // 4 cycles
-        });
+        ]);
         
         // Act & Assert
         cpu.Step(); // NOP
@@ -738,7 +753,7 @@ public class Z80CpuTests
     public void Reset_ClearsCycleCounter()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.NOP, Z80OpCode.NOP });
+        var cpu = CreateCpuWithMemory([ Z80OpCode.NOP, Z80OpCode.NOP ]);
         cpu.Step();
         cpu.Step();
         Assert.Equal(8UL, cpu.TotalCycles);
@@ -753,14 +768,31 @@ public class Z80CpuTests
     [Fact]
     public void EmulatedTimeSeconds_CalculatesCorrectly()
     {
-        // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.NOP });
-        
+        // Arrange - default clock frequency from options
+        var cpu = CreateCpuWithMemory([ Z80OpCode.NOP ]);
+
         // Act
         cpu.Step(); // 4 cycles
-        
-        // Assert - 4 cycles at 4MHz should be 1 microsecond
-        var expectedTime = 4.0 / Z80CycleTiming.CLOCK_FREQUENCY_HZ;
+
+        // Assert - cycles divided by configured frequency
+        var expectedTime = 4.0 / (cpu.Options.ClockMHz * 1_000_000.0);
+        Assert.Equal(expectedTime, cpu.EmulatedTimeSeconds, 10);
+    }
+
+    [Fact]
+    public void EmulatedTimeSeconds_UsesCustomClockFrequency()
+    {
+        // Arrange - create CPU with custom 8MHz clock
+        var memory = new Z80MemoryMap();
+        var options = new Z80CpuOptions { RomSize = 1024, RamSize = 1024, ClockMHz = 8.0 };
+        var cpu = new Z80Cpu(memory, new Z80Interrupt(), options);
+        memory.LoadRom([ Z80OpCode.NOP ]);
+
+        // Act
+        cpu.Step(); // 4 cycles
+
+        // Assert - cycles divided by custom frequency
+        var expectedTime = 4.0 / (options.ClockMHz * 1_000_000.0);
         Assert.Equal(expectedTime, cpu.EmulatedTimeSeconds, 10);
     }
 
@@ -768,11 +800,11 @@ public class Z80CpuTests
     public void ConditionalJump_ConsumesCorrectCycleCount()
     {
         // Arrange - Test JR Z, e when zero flag is set (using DEC to set zero flag)
-        var cpu = CreateCpuWithMemory(new byte[] { 
+        var cpu = CreateCpuWithMemory([
             Z80OpCode.LD_A_n, 0x01, // Load 1 into A
             Z80OpCode.DEC_A,        // Decrement A to 0 (sets zero flag)
             Z80OpCode.JR_Z_e, 0x02  // Jump forward 2 bytes if zero
-        });
+        ]);
         
         // Act
         cpu.Step(); // LD A, n
@@ -791,10 +823,10 @@ public class Z80CpuTests
     public void ConditionalJump_NotTaken_ConsumesCorrectCycles()
     {
         // Arrange - Test JR Z, e when zero flag is NOT set
-        var cpu = CreateCpuWithMemory(new byte[] { 
+        var cpu = CreateCpuWithMemory([
             Z80OpCode.LD_A_n, 0x01, // Load non-zero value (clears zero flag)
             Z80OpCode.JR_Z_e, 0x02  // Jump forward 2 bytes if zero (won't jump)
-        });
+        ]);
         
         // Act
         cpu.Step(); // LD A, n (clears zero flag)
@@ -812,7 +844,7 @@ public class Z80CpuTests
     public void LongRunningEmulation_CycleCounterDoesNotOverflow()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.NOP });
+        var cpu = CreateCpuWithMemory([ Z80OpCode.NOP ]);
         
         // Act - Simulate a large number of cycles (but not so many that test takes forever)
         const int iterations = 1000000;
@@ -835,7 +867,7 @@ public class Z80CpuTests
     public void LD_A_A_SelfAssignment_PreservesValueAndConsumesCycles()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_A_n, 0x99, Z80OpCode.LD_A_A }); // LD A, 99h; LD A, A
+        var cpu = CreateCpuWithMemory([ Z80OpCode.LD_A_n, 0x99, Z80OpCode.LD_A_A ]); // LD A, 99h; LD A, A
         
         // Act
         cpu.Step(); // Load A with 0x99
@@ -852,7 +884,7 @@ public class Z80CpuTests
     public void LD_B_B_SelfAssignment_PreservesValueAndConsumesCycles()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_B_n, 0x77, Z80OpCode.LD_B_B }); // LD B, 77h; LD B, B
+        var cpu = CreateCpuWithMemory([ Z80OpCode.LD_B_n, 0x77, Z80OpCode.LD_B_B ]); // LD B, 77h; LD B, B
         
         // Act
         cpu.Step(); // Load B with 0x77
@@ -869,7 +901,7 @@ public class Z80CpuTests
     public void LD_C_C_SelfAssignment_PreservesValueAndConsumesCycles()
     {
         // Arrange
-        var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.LD_C_n, 0x33, Z80OpCode.LD_C_C }); // LD C, 33h; LD C, C
+        var cpu = CreateCpuWithMemory([ Z80OpCode.LD_C_n, 0x33, Z80OpCode.LD_C_C ]); // LD C, 33h; LD C, C
         
         // Act
         cpu.Step(); // Load C with 0x33
