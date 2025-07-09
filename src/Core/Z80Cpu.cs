@@ -122,7 +122,7 @@ public class Z80Cpu
             case Z80OpCode.LD_A_L: A = L; cycles = Z80CycleTiming.LD_r_r; break; // LD A, L
             
             case Z80OpCode.LD_B_A: B = A; cycles = Z80CycleTiming.LD_r_r; break; // LD B, A
-            case Z80OpCode.LD_B_B: B = B; cycles = Z80CycleTiming.LD_r_r; break; // LD B, B
+            case Z80OpCode.LD_B_B: cycles = Z80CycleTiming.LD_r_r; break; // LD B, B
             case Z80OpCode.LD_B_C: B = C; cycles = Z80CycleTiming.LD_r_r; break; // LD B, C
             case Z80OpCode.LD_B_D: B = D; cycles = Z80CycleTiming.LD_r_r; break; // LD B, D
             case Z80OpCode.LD_B_E: B = E; cycles = Z80CycleTiming.LD_r_r; break; // LD B, E
@@ -131,7 +131,7 @@ public class Z80Cpu
             
             case Z80OpCode.LD_C_A: C = A; cycles = Z80CycleTiming.LD_r_r; break; // LD C, A
             case Z80OpCode.LD_C_B: C = B; cycles = Z80CycleTiming.LD_r_r; break; // LD C, B
-            case Z80OpCode.LD_C_C: C = C; cycles = Z80CycleTiming.LD_r_r; break; // LD C, C
+            case Z80OpCode.LD_C_C: cycles = Z80CycleTiming.LD_r_r; break; // LD C, C
             case Z80OpCode.LD_C_D: C = D; cycles = Z80CycleTiming.LD_r_r; break; // LD C, D
             case Z80OpCode.LD_C_E: C = E; cycles = Z80CycleTiming.LD_r_r; break; // LD C, E
             case Z80OpCode.LD_C_H: C = H; cycles = Z80CycleTiming.LD_r_r; break; // LD C, H
