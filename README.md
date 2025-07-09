@@ -39,6 +39,14 @@ dotnet run --project src/Zenix --rom path/to/game.rom --model MSX2+
 2. Drag and drop a `.ROM` file into the UI
 3. Use keyboard or gamepad to play!
 
+## 🐞 Debugging in VSCode
+
+1. Ensure the repo is opened in VSCode.
+2. Press **F5** to launch using the `.NET Core Launch` profile from `.vscode/launch.json`.
+3. Set breakpoints in files such as `src/App/EmulatorHost.cs` by clicking the gutter.
+4. While debugging, watch the `Registers` object and variables in the **Variables** pane.
+5. The debug monitor prints register and memory state after each CPU step.
+
 ---
 
 ## 📚 Project Documentation
