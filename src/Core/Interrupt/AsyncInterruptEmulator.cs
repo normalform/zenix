@@ -294,10 +294,25 @@ public class AsyncInterruptEmulator : IDisposable
         {
             // Expected when cancellation is requested
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
-            // Log or handle unexpected exceptions
-            Console.WriteLine($"AsyncInterruptEmulator error: {ex.Message}");
+            // Handle specific expected exception
+            Console.WriteLine($"Invalid operation in AsyncInterruptEmulator: {ex.Message}");
+        }
+        catch (TimeoutException ex)
+        {
+            // Handle timeout-related exceptions
+            Console.WriteLine($"Timeout in AsyncInterruptEmulator: {ex.Message}");
+        }
+        catch (Exception ex) when (!(ex is OutOfMemoryException || ex is ThreadAbortException || ex is AccessViolationException))
+        {
+            // Log or handle unexpected exceptions, excluding critical ones
+            Console.WriteLine($"Unexpected error in AsyncInterruptEmulator: {ex.Message}");
+        }
+        catch
+        {
+            // Allow critical exceptions to propagate
+            throw;
         }
     }
 
