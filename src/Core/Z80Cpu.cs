@@ -85,9 +85,10 @@ public class Z80Cpu
     }
 
     /// <summary>
-    /// Emulated time elapsed in seconds based on cycle count at 4MHz.
+    /// Emulated time elapsed in seconds based on cycle count and configured clock frequency.
     /// </summary>
-    public double EmulatedTimeSeconds => (double)_totalCycles / Z80CycleTiming.CLOCK_FREQUENCY_HZ;
+    public double EmulatedTimeSeconds =>
+        _totalCycles / (Options.ClockMHz * 1_000_000.0);
 
     public void Reset()
     {

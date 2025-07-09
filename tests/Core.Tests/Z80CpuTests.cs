@@ -766,14 +766,31 @@ public class Z80CpuTests
     [Fact]
     public void EmulatedTimeSeconds_CalculatesCorrectly()
     {
-        // Arrange
+        // Arrange - default clock frequency from options
         var cpu = CreateCpuWithMemory(new byte[] { Z80OpCode.NOP });
-        
+
         // Act
         cpu.Step(); // 4 cycles
-        
-        // Assert - 4 cycles at 4MHz should be 1 microsecond
-        var expectedTime = 4.0 / Z80CycleTiming.CLOCK_FREQUENCY_HZ;
+
+        // Assert - cycles divided by configured frequency
+        var expectedTime = 4.0 / (cpu.Options.ClockMHz * 1_000_000.0);
+        Assert.Equal(expectedTime, cpu.EmulatedTimeSeconds, 10);
+    }
+
+    [Fact]
+    public void EmulatedTimeSeconds_UsesCustomClockFrequency()
+    {
+        // Arrange - create CPU with custom 8MHz clock
+        var memory = new MsxMemoryMap();
+        var options = new Z80CpuOptions { RomSize = 1024, RamSize = 1024, ClockMHz = 8.0 };
+        var cpu = new Z80Cpu(memory, options);
+        memory.LoadRom(new byte[] { Z80OpCode.NOP });
+
+        // Act
+        cpu.Step(); // 4 cycles
+
+        // Assert - cycles divided by custom frequency
+        var expectedTime = 4.0 / (options.ClockMHz * 1_000_000.0);
         Assert.Equal(expectedTime, cpu.EmulatedTimeSeconds, 10);
     }
 
