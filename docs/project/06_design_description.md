@@ -18,18 +18,30 @@ Zenix is built with a strong separation of concerns using Onion Architecture. Co
 - **Responsibilities:**
   - Executes Z80 instructions cycle-accurately with precise timing constants
   - Maintains a 64-bit cycle counter capable of tracking 10+ years of continuous operation at 4MHz
-  - Handles interrupt modes (IM 0, 1, 2)
+  - Handles interrupt modes (IM 0, 1, 2) through dependency-injected interrupt controller
   - Emits trace spans for telemetry if enabled
   - Provides emulated time calculation and effective frequency monitoring
-- **Dependencies:** Memory interface, interrupt controller
+- **Dependencies:** Memory interface (`Z80MemoryMap`), interrupt controller (`IZ80Interrupt`)
 - **Cycle Accuracy:** Each instruction consumes the exact number of cycles as specified in the Z80 technical documentation, enabling precise timing for MSX hardware compatibility
 - **Detailed Design:** See [Z80 CPU Core Design](../design/Core/Z80Cpu.md) for comprehensive implementation details
+
+### ⚡ Z80 Interrupt System
+
+- **Interface:** `IZ80Interrupt`
+- **Implementation:** `Z80Interrupt`
+- **Responsibilities:**
+  - Manages maskable and non-maskable interrupts
+  - Implements all three Z80 interrupt modes (IM 0, IM 1, IM 2)
+  - Handles interrupt timing, priority, and state management
+  - Provides dependency injection for testing and modularity
+- **Features:** Accurate EI delay, proper IFF1/IFF2 handling, NMI priority
+- **Detailed Design:** See [Z80 Interrupt System Design](../design/Core/Z80InterruptSystem.md) for comprehensive implementation details
 
 ---
 
 ### 🧠 Memory and Slot Mapper
 
-- **Class:** `MsxMemoryMap`, `SlotManager`
+- **Class:** `Z80MemoryMap`, `SlotManager`
 - **Responsibilities:**
   - Emulates 64KB segmented memory with slot mapping
   - Supports cartridge slots, RAM, VRAM, and I/O ports

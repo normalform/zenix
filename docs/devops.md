@@ -245,6 +245,61 @@ The build system automatically applies version properties:
 </PropertyGroup>
 ```
 
+### Strict Static Code Analysis
+
+**⚠️ CRITICAL: Zenix enforces zero-tolerance static code analysis rules.**
+
+#### **Configuration Files**
+
+Two files work together to enforce strict code quality:
+
+1. **`Directory.Build.props`** (MSBuild Properties):
+   ```xml
+   <PropertyGroup>
+     <!-- Treat all warnings as errors -->
+     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+     <WarningsAsErrors />
+     <WarningsNotAsErrors />
+     
+     <!-- Code Analysis -->
+     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+     <AnalysisLevel>latest</AnalysisLevel>
+     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+     
+     <!-- Specific rule enforcement (error level) -->
+     <IDE0130>error</IDE0130> <!-- Namespace must match folder structure -->
+     <IDE0300>error</IDE0300> <!-- Use collection expressions -->
+     <IDE0161>error</IDE0161> <!-- Use file-scoped namespace -->
+     <IDE0065>error</IDE0065> <!-- Using directive placement -->
+     <IDE0005>error</IDE0005> <!-- Remove unnecessary usings -->
+     <IDE0011>error</IDE0011> <!-- Add braces to if statements -->
+   </PropertyGroup>
+   ```
+
+2. **`.editorconfig`** (Editor Configuration):
+   ```ini
+   [*.cs]
+   # Enforce same rules at editor level
+   dotnet_diagnostic.IDE0130.severity = error
+   dotnet_diagnostic.IDE0300.severity = error
+   csharp_style_namespace_declarations = file_scoped:error
+   csharp_prefer_braces = true:error
+   ```
+
+#### **CI/CD Impact**
+
+- ✅ **Clean builds only**: Any style violation fails the entire pipeline
+- 🚫 **No warnings allowed**: `TreatWarningsAsErrors=true` enforced
+- 🔧 **Consistent quality**: All contributors must follow identical standards
+- 📊 **Measurable standards**: Code quality is automatically verified
+
+#### **Benefits for DevOps**
+
+1. **Predictable builds**: No "works on my machine" style issues
+2. **Faster code reviews**: Focus on logic, not style
+3. **Reduced technical debt**: Issues caught before merge
+4. **Team efficiency**: No debates about formatting or style choices
+
 ## Release Process
 
 Zenix supports both **automatic** and **manual** release processes to accommodate different development scenarios.

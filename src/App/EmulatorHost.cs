@@ -5,37 +5,54 @@ using Zenix.Core;
 
 namespace Zenix.App;
 
+/// <summary>
+/// Main emulator host that manages the lifecycle and execution of the MSX emulator
+/// </summary>
 public class EmulatorHost
 {
-    private readonly MsxMemoryMap _memory = new();
+    private readonly EmulatorCompositionRoot _compositionRoot;
     private readonly Z80Cpu _cpu;
 
-    public EmulatorHost()
+    /// <summary>
+    /// Initialize the emulator host with default configuration
+    /// </summary>
+    public EmulatorHost() : this(null)
     {
-        _cpu = new Z80Cpu(_memory);
-
-        // Attach debug hooks to log memory accesses
-        _cpu.MemoryReadHook = (addr, val) =>
-            Console.WriteLine($"READ  {addr:X4}: {val:X2}");
-        _cpu.MemoryWriteHook = (addr, val) =>
-            Console.WriteLine($"WRITE {addr:X4}: {val:X2}");
     }
 
-    public void Step()
+    /// <summary>
+    /// Initialize the emulator host with custom configuration
+    /// </summary>
+    /// <param name="configurationPath">Path to configuration file (optional)</param>
+    public EmulatorHost(string? configurationPath)
+    {
+        _compositionRoot = new EmulatorCompositionRoot(configurationPath);
+        _cpu = _compositionRoot.CreateCpu();
+    }
+
+    /// <summary>
+    /// Run a single CPU step/frame
+    /// </summary>
+    public void RunFrame()
     {
         _cpu.Step();
-        DumpState();
     }
 
-    private void DumpState()
-    {
-        Console.WriteLine($"PC:{_cpu.PC:X4} AF:{_cpu.A:X2}{_cpu.F:X2} BC:{_cpu.B:X2}{_cpu.C:X2} DE:{_cpu.D:X2}{_cpu.E:X2} HL:{_cpu.H:X2}{_cpu.L:X2} SP:{_cpu.SP:X4}");
+    /// <summary>
+    /// Get the CPU instance for direct access
+    /// </summary>
+    public Z80Cpu Cpu => _cpu;
 
-        Console.Write("MEM[0000-000F]:");
-        for (ushort i = 0; i < 0x10; i++)
-        {
-            Console.Write($" {_memory.ReadByte(i):X2}");
-        }
-        Console.WriteLine();
+    /// <summary>
+    /// Get the composition root for accessing other services
+    /// </summary>
+    public EmulatorCompositionRoot CompositionRoot => _compositionRoot;
+
+    /// <summary>
+    /// Dispose of resources
+    /// </summary>
+    public void Dispose()
+    {
+        _compositionRoot.Dispose();
     }
 }

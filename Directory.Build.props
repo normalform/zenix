@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  
+  <!-- Common properties applied to all projects in the solution -->
+  <PropertyGroup>
+    <!-- Target Framework -->
+    <TargetFramework>net8.0</TargetFramework>
+    
+    <!-- Language Version -->
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    <!-- Compiler Settings -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <WarningsNotAsErrors />
+    
+    <!-- Code Analysis -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    
+    <!-- Assembly Info -->
+    <Product>Zenix MSX Emulator</Product>
+    <Company>Zenix Project</Company>
+    <Copyright>Copyright (c) 2025 Zenix Project</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
+    
+    <!-- Build Output -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn> <!-- Missing XML documentation warnings -->
+    
+    <!-- File-scoped namespaces (IDE0161) -->
+    <UseFileScopedNamespaces>true</UseFileScopedNamespaces>
+  </PropertyGroup>
+
+  <!-- Specific rules and analyzers -->
+  <PropertyGroup>
+    <!-- Enforce IDE0130: Namespace does not match folder structure -->
+    <IDE0130>error</IDE0130>
+    
+    <!-- Enforce IDE0300: Use collection expressions -->
+    <IDE0300>error</IDE0300>
+    
+    <!-- File-scoped namespaces and code organization -->
+    <IDE0161>error</IDE0161> <!-- Use file-scoped namespace -->
+    <IDE0065>error</IDE0065> <!-- Using directive placement -->
+    <IDE0005>error</IDE0005> <!-- Remove unnecessary usings -->
+    
+    <!-- Code style enforcement -->
+    <IDE0011>error</IDE0011> <!-- Add braces to if statements -->
+    <IDE0046>suggestion</IDE0046> <!-- Use conditional expression for assignment -->
+    <IDE0047>suggestion</IDE0047> <!-- Remove unnecessary parentheses -->
+    <IDE0048>suggestion</IDE0048> <!-- Add parentheses for clarity -->
+    
+    <!-- Variable and expression preferences -->
+    <IDE0007>suggestion</IDE0007> <!-- Use implicit type -->
+    <IDE0008>suggestion</IDE0008> <!-- Use explicit type -->
+    <IDE0009>suggestion</IDE0009> <!-- Add this or Me qualification -->
+    <IDE0010>suggestion</IDE0010> <!-- Add missing cases to switch -->
+    
+    <!-- Null checking and pattern matching -->
+    <IDE0016>suggestion</IDE0016> <!-- Use throw expression -->
+    <IDE0017>suggestion</IDE0017> <!-- Use object initializers -->
+    <IDE0018>suggestion</IDE0018> <!-- Inline variable declaration -->
+    <IDE0019>suggestion</IDE0019> <!-- Use pattern matching to avoid is check followed by cast -->
+    <IDE0020>suggestion</IDE0020> <!-- Use pattern matching to avoid is check followed by cast (with variable) -->
+    <IDE0021>suggestion</IDE0021> <!-- Use expression body for constructors -->
+    <IDE0022>suggestion</IDE0022> <!-- Use expression body for methods -->
+    <IDE0023>suggestion</IDE0023> <!-- Use expression body for conversion operators -->
+    <IDE0024>suggestion</IDE0024> <!-- Use expression body for operators -->
+    <IDE0025>suggestion</IDE0025> <!-- Use expression body for properties -->
+    <IDE0026>suggestion</IDE0026> <!-- Use expression body for indexers -->
+    <IDE0027>suggestion</IDE0027> <!-- Use expression body for accessors -->
+    
+    <!-- Collection and LINQ preferences -->
+    <IDE0028>suggestion</IDE0028> <!-- Use collection initializers -->
+    <IDE0029>suggestion</IDE0029> <!-- Use coalesce expression -->
+    <IDE0030>suggestion</IDE0030> <!-- Use coalesce expression (nullable) -->
+    <IDE0031>suggestion</IDE0031> <!-- Use null propagation -->
+    <IDE0032>suggestion</IDE0032> <!-- Use auto property -->
+    <IDE0033>suggestion</IDE0033> <!-- Use explicitly provided tuple name -->
+    <IDE0034>suggestion</IDE0034> <!-- Simplify default expression -->
+    <IDE0035>suggestion</IDE0035> <!-- Remove unreachable code -->
+    <IDE0036>suggestion</IDE0036> <!-- Order modifiers -->
+    <IDE0037>suggestion</IDE0037> <!-- Use inferred member name -->
+    <IDE0038>suggestion</IDE0038> <!-- Use pattern matching to avoid is check followed by cast -->
+    <IDE0039>suggestion</IDE0039> <!-- Use local function instead of lambda -->
+    <IDE0040>suggestion</IDE0040> <!-- Add accessibility modifiers -->
+    <IDE0041>suggestion</IDE0041> <!-- Use is null check -->
+    <IDE0042>suggestion</IDE0042> <!-- Deconstruct variable declaration -->
+    <IDE0043>warning</IDE0043> <!-- Format string contains invalid placeholder -->
+    <IDE0044>suggestion</IDE0044> <!-- Add readonly modifier -->
+    <IDE0045>suggestion</IDE0045> <!-- Use conditional expression for assignment -->
+    
+    <!-- Switch expression and pattern matching -->
+    <IDE0066>suggestion</IDE0066> <!-- Use switch expression -->
+    <IDE0070>suggestion</IDE0070> <!-- Use System.HashCode.Combine -->
+    <IDE0071>suggestion</IDE0071> <!-- Simplify interpolation -->
+    <IDE0072>suggestion</IDE0072> <!-- Add missing cases to switch expression -->
+    <IDE0073>suggestion</IDE0073> <!-- Use file header -->
+    <IDE0074>suggestion</IDE0074> <!-- Use compound assignment -->
+    <IDE0075>suggestion</IDE0075> <!-- Simplify conditional expression -->
+    <IDE0076>warning</IDE0076> <!-- Remove invalid global SuppressMessageAttribute -->
+    <IDE0077>warning</IDE0077> <!-- Avoid legacy format target in global SuppressMessageAttribute -->
+    <IDE0078>suggestion</IDE0078> <!-- Use pattern matching -->
+    <IDE0079>suggestion</IDE0079> <!-- Remove unnecessary suppression -->
+    <IDE0080>suggestion</IDE0080> <!-- Remove unnecessary suppression operator -->
+    <IDE0081>suggestion</IDE0081> <!-- Remove unnecessary suppression operator -->
+    <IDE0082>suggestion</IDE0082> <!-- Convert typeof to nameof -->
+    <IDE0083>suggestion</IDE0083> <!-- Use pattern matching (not operator) -->
+    <IDE0084>suggestion</IDE0084> <!-- Use pattern matching (IsNot operator) -->
+    <IDE0090>suggestion</IDE0090> <!-- Simplify new expression -->
+    <IDE0100>suggestion</IDE0100> <!-- Remove unnecessary equality operator -->
+    <IDE0110>suggestion</IDE0110> <!-- Remove unnecessary discard -->
+    <IDE0120>suggestion</IDE0120> <!-- Simplify LINQ expression -->
+    <IDE0150>suggestion</IDE0150> <!-- Prefer null check over type check -->
+    <IDE0160>suggestion</IDE0160> <!-- Use block-scoped namespace -->
+    <IDE0170>suggestion</IDE0170> <!-- Simplify property pattern -->
+    <IDE0180>suggestion</IDE0180> <!-- Use tuple to swap values -->
+    <IDE0200>suggestion</IDE0200> <!-- Remove unnecessary lambda expression -->
+    <IDE0210>suggestion</IDE0210> <!-- Convert to top-level statements -->
+    <IDE0220>suggestion</IDE0220> <!-- Add explicit cast -->
+    <IDE0230>suggestion</IDE0230> <!-- Use UTF-8 string literal -->
+    <IDE0240>suggestion</IDE0240> <!-- Nullable directive is redundant -->
+    <IDE0241>suggestion</IDE0241> <!-- Nullable directive is unnecessary -->
+    <IDE0250>suggestion</IDE0250> <!-- Make struct readonly -->
+    <IDE0251>suggestion</IDE0251> <!-- Make member readonly -->
+    <IDE0260>suggestion</IDE0260> <!-- Use pattern matching -->
+    <IDE0270>suggestion</IDE0270> <!-- Null check can be simplified -->
+    <IDE0280>suggestion</IDE0280> <!-- Use nameof -->
+    <IDE0290>suggestion</IDE0290> <!-- Use primary constructor -->
+    
+    <!-- StyleCop rules for consistency -->
+    <SA1633>none</SA1633> <!-- File headers (we use our own format) -->
+    <SA1200>none</SA1200> <!-- Using directives placement (handled by IDE0065) -->
+    <SA1101>none</SA1101> <!-- Prefix local calls with this -->
+    <SA1309>none</SA1309> <!-- Field names should not begin with underscore (we use underscore for private fields) -->
+  </PropertyGroup>
+
+  <!-- Package references common to all projects -->
+  <ItemGroup>
+    <!-- Code analysis packages -->
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Test project specific settings -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true' OR $(MSBuildProjectName.Contains('Test'))">
+    <!-- Disable documentation generation for test projects but keep IDE0005 working -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- Allow missing XML docs in test projects -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- Test project package references -->
+  <ItemGroup Condition="'$(IsTestProject)' == 'true' OR $(MSBuildProjectName.Contains('Test'))">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

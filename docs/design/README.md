@@ -2,6 +2,8 @@
 
 This directory contains comprehensive design specifications for individual components of the Zenix emulator.
 
+> 📊 **Current Status**: The Zenix emulator core architecture is complete with cycle-accurate Z80 CPU emulation, comprehensive interrupt system, and clean architecture following modern C# conventions. All 90 tests pass and the project follows IDE0130 namespace compliance.
+
 ---
 
 ## 📋 Overview
@@ -25,12 +27,33 @@ The detailed design documents provide in-depth technical specifications, impleme
   - Testing strategy and benchmarks
   - Future enhancement roadmap
 
+#### ⚡ [Z80 Interrupt Interface](Core/Z80InterruptInterface.md)
+- **Status**: ✅ Complete
+- **Coverage**: Interface design and implementation details
+- **Contents**:
+  - IZ80Interrupt interface specification
+  - Implementation architecture and patterns
+  - Interrupt source management
+  - Testing strategies and performance considerations
+  - Usage examples and best practices
+
+#### ⚡ [Z80 Interrupt System](Core/Z80InterruptSystem.md)
+- **Status**: ✅ Complete
+- **Coverage**: Z80 interrupt system implementation
+- **Contents**:
+  - Maskable and non-maskable interrupts
+  - Interrupt modes (IM 0, IM 1, IM 2)
+  - Timing and priority handling
+  - MSX-specific interrupt usage
+  - Implementation architecture
+  - Instruction reference
+
 ### Planned Components
 
 The following detailed design documents are planned for future implementation:
 
 #### 🧠 Memory System
-- **File**: `Core/MsxMemoryMap.md`
+- **File**: `Core/Z80MemoryMap.md`
 - **Status**: 📋 Planned
 - **Coverage**: Memory mapping, slot system, banking
 

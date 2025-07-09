@@ -1,11 +1,14 @@
 // Copyright (c) 2025 Zenix Project
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
+using Zenix.Core.Interrupt;
+
 namespace Zenix.Core;
 
 public class Z80Cpu
 {
-    private readonly MsxMemoryMap _memory;
+    private readonly Z80MemoryMap _memory;
+    private readonly IZ80Interrupt _interrupt;
     public Z80CpuOptions Options { get; }
 
     // Register storage accessible for debug tools
@@ -45,9 +48,10 @@ public class Z80Cpu
     private ulong _totalCycles = 0;
     private DateTime _emulationStartTime = DateTime.UtcNow;
 
-    public Z80Cpu(MsxMemoryMap memory, Z80CpuOptions? options = null)
+    public Z80Cpu(Z80MemoryMap memory, IZ80Interrupt interrupt, Z80CpuOptions? options = null)
     {
         _memory = memory;
+        _interrupt = interrupt;
         Options = options ?? new Z80CpuOptions();
         _memory.Configure(Options.RomSize, Options.RamSize);
         Reset();
@@ -66,6 +70,11 @@ public class Z80Cpu
     public bool Halted { get; private set; }
 
     /// <summary>
+    /// Interrupt controller for handling Z80 interrupts
+    /// </summary>
+    public IZ80Interrupt Interrupt => _interrupt;
+
+    /// <summary>
     /// Total number of CPU cycles executed since reset.
     /// Can accurately track over 10 years of operation at 4MHz.
     /// </summary>
@@ -79,7 +88,10 @@ public class Z80Cpu
         get
         {
             var elapsed = DateTime.UtcNow - _emulationStartTime;
-            if (elapsed.TotalSeconds < 0.001) return 0.0;
+            if (elapsed.TotalSeconds < 0.001)
+            {
+                return 0.0;
+            }
             return _totalCycles / elapsed.TotalSeconds;
         }
     }
@@ -97,10 +109,21 @@ public class Z80Cpu
         Halted = false;
         _totalCycles = 0;
         _emulationStartTime = DateTime.UtcNow;
+        _interrupt.Reset();
     }
 
     public void Step()
     {
+        // Handle interrupt timing
+        _interrupt.BeforeInstruction();
+        
+        // Check for interrupts before instruction execution
+        if (_interrupt.ShouldProcessInterrupt(out Z80InterruptRequest interruptRequest))
+        {
+            HandleInterrupt(interruptRequest);
+            return;
+        }
+        
         if (Halted) 
         {
             // HALT state still consumes cycles
@@ -383,6 +406,58 @@ public class Z80Cpu
                 cycles = Z80CycleTiming.POP_qq;
                 break;
             
+            // Interrupt instructions
+            case Z80OpCode.EI: // EI - Enable interrupts
+                _interrupt.EnableInterrupts();
+                cycles = Z80CycleTiming.EI;
+                break;
+            case Z80OpCode.DI: // DI - Disable interrupts
+                _interrupt.DisableInterrupts();
+                cycles = Z80CycleTiming.DI;
+                break;
+            
+            // Extended instructions (ED prefix)
+            case Z80OpCode.ED_PREFIX: // ED prefix
+                byte extendedOpcode = _memory.ReadByte(PC++);
+                switch (extendedOpcode)
+                {
+                    case Z80OpCode.IM_0: // IM 0
+                        _interrupt.SetInterruptMode(Z80InterruptMode.Mode0);
+                        cycles = Z80CycleTiming.IM_0;
+                        break;
+                    case Z80OpCode.IM_1: // IM 1
+                        _interrupt.SetInterruptMode(Z80InterruptMode.Mode1);
+                        cycles = Z80CycleTiming.IM_1;
+                        break;
+                    case Z80OpCode.IM_2: // IM 2
+                        _interrupt.SetInterruptMode(Z80InterruptMode.Mode2);
+                        cycles = Z80CycleTiming.IM_2;
+                        break;
+                    case Z80OpCode.RETI: // RETI
+                        PC = PopWord();
+                        _interrupt.ReturnFromInterrupt();
+                        cycles = Z80CycleTiming.RETI;
+                        break;
+                    case Z80OpCode.RETN: // RETN
+                        PC = PopWord();
+                        _interrupt.ReturnFromNonMaskableInterrupt();
+                        cycles = Z80CycleTiming.RETN;
+                        break;
+                    default:
+                        throw new NotImplementedException($"Extended opcode 0xED{extendedOpcode:X2} not implemented");
+                }
+                break;
+            
+            // RST instructions (used by interrupt mode 0)
+            case Z80OpCode.RST_00: PushWord(PC); PC = 0x0000; cycles = Z80CycleTiming.PUSH_qq; break; // RST 00h
+            case Z80OpCode.RST_08: PushWord(PC); PC = 0x0008; cycles = Z80CycleTiming.PUSH_qq; break; // RST 08h
+            case Z80OpCode.RST_10: PushWord(PC); PC = 0x0010; cycles = Z80CycleTiming.PUSH_qq; break; // RST 10h
+            case Z80OpCode.RST_18: PushWord(PC); PC = 0x0018; cycles = Z80CycleTiming.PUSH_qq; break; // RST 18h
+            case Z80OpCode.RST_20: PushWord(PC); PC = 0x0020; cycles = Z80CycleTiming.PUSH_qq; break; // RST 20h
+            case Z80OpCode.RST_28: PushWord(PC); PC = 0x0028; cycles = Z80CycleTiming.PUSH_qq; break; // RST 28h
+            case Z80OpCode.RST_30: PushWord(PC); PC = 0x0030; cycles = Z80CycleTiming.PUSH_qq; break; // RST 30h
+            case Z80OpCode.RST_38: PushWord(PC); PC = 0x0038; cycles = Z80CycleTiming.PUSH_qq; break; // RST 38h
+            
             // System
             case Z80OpCode.HALT: // HALT
                 Halted = true;
@@ -397,6 +472,74 @@ public class Z80Cpu
         _totalCycles += cycles;
     }
     
+    // Handle interrupt processing
+    private void HandleInterrupt(Z80InterruptRequest interruptRequest)
+    {
+        // Process the interrupt and get vector/instruction
+        byte instruction = _interrupt.ProcessInterrupt(interruptRequest, out ushort vector);
+        
+        if (interruptRequest.Type == Z80InterruptType.NonMaskable)
+        {
+            // NMI: Push PC and jump to 0x0066
+            PushWord(PC);
+            PC = vector;
+            _totalCycles += Z80CycleTiming.NMI_CYCLES;
+            Halted = false; // NMI wakes up from HALT
+        }
+        else
+        {
+            // Maskable interrupt
+            PushWord(PC);
+            
+            switch (_interrupt.InterruptMode)
+            {
+                case Z80InterruptMode.Mode0:
+                    // Execute instruction placed on bus by interrupting device
+                    // This is typically a RST instruction
+                    ExecuteInterruptInstruction(instruction);
+                    _totalCycles += Z80CycleTiming.INT_MODE0_CYCLES;
+                    break;
+                
+                case Z80InterruptMode.Mode1:
+                    // Jump to fixed vector 0x0038
+                    PC = vector;
+                    _totalCycles += Z80CycleTiming.INT_MODE1_CYCLES;
+                    break;
+                
+                case Z80InterruptMode.Mode2:
+                    // Vector table lookup
+                    ushort vectorLow = _memory.ReadByte(vector);
+                    ushort vectorHigh = _memory.ReadByte((ushort)(vector + 1));
+                    PC = (ushort)(vectorLow | (vectorHigh << 8));
+                    _totalCycles += Z80CycleTiming.INT_MODE2_CYCLES;
+                    break;
+            }
+            
+            Halted = false; // Interrupts wake up from HALT
+        }
+    }
+    
+    /// <summary>
+    /// Execute instruction placed on bus during IM0 interrupt
+    /// </summary>
+    private void ExecuteInterruptInstruction(byte instruction)
+    {
+        // Most interrupt devices place RST instructions on the bus
+        // RST n: Push PC, jump to n*8
+        if ((instruction & 0xC7) == 0xC7)
+        {
+            // RST instruction: bits 7,6,0 = 1,1,1 and bits 5,4,3 = restart address
+            byte rstAddress = (byte)((instruction & 0x38) >> 3);
+            PC = (ushort)(rstAddress * 8);
+        }
+        else
+        {
+            // For non-RST instructions, we would need to decode and execute
+            // For now, treat as NOP with warning
+            PC = 0x0038; // Default to IM1 vector as fallback
+        }
+    }
+
     // Helper methods for register pairs
     private ushort GetBC() => (ushort)((B << 8) | C);
     private ushort GetDE() => (ushort)((D << 8) | E);
@@ -485,16 +628,24 @@ public class Z80Cpu
     private void SetZeroFlag(bool value)
     {
         if (value)
+        {
             F |= Z80OpCode.FLAG_ZERO;
+        }
         else
+        {
             F &= Z80OpCode.FLAG_ZERO_MASK;
+        }
     }
     
     private void SetCarryFlag(bool value)
     {
         if (value)
+        {
             F |= Z80OpCode.FLAG_CARRY;
+        }
         else
+        {
             F &= Z80OpCode.FLAG_CARRY_MASK;
+        }
     }
 }
