@@ -294,4 +294,60 @@ public static class Z80OpCode
     public const byte BYTE_MASK = 0xFF;
     
     #endregion
+
+    #region Interrupt Instructions
+    
+    /// <summary>EI - Enable interrupts</summary>
+    public const byte EI = 0xFB;
+    
+    /// <summary>DI - Disable interrupts</summary>
+    public const byte DI = 0xF3;
+    
+    /// <summary>IM 0 - Set interrupt mode 0 (ED prefix)</summary>
+    public const byte IM_0 = 0x46; // After ED prefix
+    
+    /// <summary>IM 1 - Set interrupt mode 1 (ED prefix)</summary>
+    public const byte IM_1 = 0x56; // After ED prefix
+    
+    /// <summary>IM 2 - Set interrupt mode 2 (ED prefix)</summary>
+    public const byte IM_2 = 0x5E; // After ED prefix
+    
+    /// <summary>RETI - Return from interrupt (ED prefix)</summary>
+    public const byte RETI = 0x4D; // After ED prefix
+    
+    /// <summary>RETN - Return from non-maskable interrupt (ED prefix)</summary>
+    public const byte RETN = 0x45; // After ED prefix
+    
+    /// <summary>ED prefix for extended instructions</summary>
+    public const byte ED_PREFIX = 0xED;
+    
+    #endregion
+
+    #region RST Instructions (for interrupt mode 0)
+    
+    /// <summary>RST 00h - Restart to address 0x0000</summary>
+    public const byte RST_00 = 0xC7;
+    
+    /// <summary>RST 08h - Restart to address 0x0008</summary>
+    public const byte RST_08 = 0xCF;
+    
+    /// <summary>RST 10h - Restart to address 0x0010</summary>
+    public const byte RST_10 = 0xD7;
+    
+    /// <summary>RST 18h - Restart to address 0x0018</summary>
+    public const byte RST_18 = 0xDF;
+    
+    /// <summary>RST 20h - Restart to address 0x0020</summary>
+    public const byte RST_20 = 0xE7;
+    
+    /// <summary>RST 28h - Restart to address 0x0028</summary>
+    public const byte RST_28 = 0xEF;
+    
+    /// <summary>RST 30h - Restart to address 0x0030</summary>
+    public const byte RST_30 = 0xF7;
+    
+    /// <summary>RST 38h - Restart to address 0x0038</summary>
+    public const byte RST_38 = 0xFF;
+    
+    #endregion
 }

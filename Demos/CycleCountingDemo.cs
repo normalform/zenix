@@ -2,16 +2,17 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 using System;
+using Zenix.App;
 using Zenix.Core;
 
-namespace Demos
+namespace Zenix.Demos;
+
+/// <summary>
+/// Demonstrates the cycle counting capabilities of the Z80 CPU emulator
+/// and verifies that it can accurately track more than 10 years of operation at 4MHz.
+/// </summary>
+public class CycleCountingDemo
 {
-    /// <summary>
-    /// Demonstrates the cycle counting capabilities of the Z80 CPU emulator
-    /// and verifies that it can accurately track more than 10 years of operation at 4MHz.
-    /// </summary>
-    public class CycleCountingDemo
-    {
         public static void RunDemo()
         {
             Console.WriteLine("Z80 CPU Cycle Counting Demonstration");
@@ -79,8 +80,9 @@ namespace Demos
             Console.WriteLine("CPU Cycle Tracking Demo:");
             Console.WriteLine("-----------------------");
 
-            var memory = new MsxMemoryMap();
-            var cpu = new Z80Cpu(memory, new Z80CpuOptions { RomSize = 1024, RamSize = 1024 });
+            var compositionRoot = new EmulatorCompositionRoot();
+            var cpu = compositionRoot.CreateCpu(new Z80CpuOptions { RomSize = 1024, RamSize = 1024 });
+            var memory = compositionRoot.GetService<Z80MemoryMap>();
 
             // Load a simple program
             var program = new byte[]
@@ -126,8 +128,9 @@ namespace Demos
             // Simulate running for a very long time by directly setting a large cycle count
             // (We can't actually run for 10 years in a demo!)
             
-            var memory = new MsxMemoryMap();
-            var cpu = new Z80Cpu(memory, new Z80CpuOptions());
+            var compositionRoot = new EmulatorCompositionRoot();
+            var cpu = compositionRoot.CreateCpu();
+            var memory = compositionRoot.GetService<Z80MemoryMap>();
             
             // Calculate cycles for various long periods
             const uint clockFreq = Z80CycleTiming.CLOCK_FREQUENCY_HZ;
@@ -168,4 +171,3 @@ namespace Demos
             }
         }
     }
-}

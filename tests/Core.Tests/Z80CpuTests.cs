@@ -2,16 +2,18 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 using Xunit;
+using Zenix.Core;
+using Zenix.Core.Interrupt;
 
-namespace Zenix.Core.Tests;
+namespace Zenix.Tests.Core.Tests;
 
 public class Z80CpuTests
 {
-    private Z80Cpu CreateCpuWithMemory(byte[]? program = null)
+    private Z80Cpu CreateCpuWithMemory(byte[]? program = null, IZ80Interrupt? interrupt = null)
     {
-        var memory = new MsxMemoryMap();
+        var memory = new Z80MemoryMap();
         var options = new Z80CpuOptions { RomSize = 1024, RamSize = 1024 };
-        var cpu = new Z80Cpu(memory, options);
+        var cpu = new Z80Cpu(memory, interrupt ?? new Z80Interrupt(), options);
         
         if (program != null)
         {
@@ -299,7 +301,7 @@ public class Z80CpuTests
         
         // Assert
         // Verify the memory was written
-        var memory = (MsxMemoryMap?)cpu.GetType().GetField("_memory", 
+        var memory = (Z80MemoryMap?)cpu.GetType().GetField("_memory", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(cpu);
         Assert.NotNull(memory);
         Assert.Equal(0x55, memory.ReadByte(0x400));
@@ -620,7 +622,7 @@ public class Z80CpuTests
         Assert.True(cpu.Halted);
         
         // Verify memory was written
-        var memory = (MsxMemoryMap?)cpu.GetType().GetField("_memory", 
+        var memory = (Z80MemoryMap?)cpu.GetType().GetField("_memory", 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(cpu);
         Assert.NotNull(memory);
         Assert.Equal(0x30, memory.ReadByte(0x200));
@@ -635,9 +637,9 @@ public class Z80CpuTests
         {
             var rom = File.ReadAllBytes(binPath);
 
-            var memory = new MsxMemoryMap();
+            var memory = new Z80MemoryMap();
             var options = new Z80CpuOptions { RomSize = rom.Length, RamSize = 256 };
-            var cpu = new Z80Cpu(memory, options);
+            var cpu = new Z80Cpu(memory, new Z80Interrupt(), options);
             memory.LoadRom(rom);
 
             // Act

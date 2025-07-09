@@ -120,4 +120,41 @@ public static class Z80CycleTiming
     public const ulong MAX_CYCLE_COUNT = ulong.MaxValue;
     
     #endregion
+
+    #region Interrupt Operations
+    
+    /// <summary>NMI - Non-maskable interrupt (11 cycles)</summary>
+    public const byte NMI_CYCLES = 11;
+    
+    /// <summary>INT IM0 - Maskable interrupt mode 0 (13 cycles)</summary>
+    public const byte INT_MODE0_CYCLES = 13;
+    
+    /// <summary>INT IM1 - Maskable interrupt mode 1 (13 cycles)</summary>
+    public const byte INT_MODE1_CYCLES = 13;
+    
+    /// <summary>INT IM2 - Maskable interrupt mode 2 (19 cycles)</summary>
+    public const byte INT_MODE2_CYCLES = 19;
+    
+    /// <summary>EI - Enable interrupts (4 cycles)</summary>
+    public const byte EI = 4;
+    
+    /// <summary>DI - Disable interrupts (4 cycles)</summary>
+    public const byte DI = 4;
+    
+    /// <summary>IM 0 - Set interrupt mode 0 (8 cycles)</summary>
+    public const byte IM_0 = 8;
+    
+    /// <summary>IM 1 - Set interrupt mode 1 (8 cycles)</summary>
+    public const byte IM_1 = 8;
+    
+    /// <summary>IM 2 - Set interrupt mode 2 (8 cycles)</summary>
+    public const byte IM_2 = 8;
+    
+    /// <summary>RETI - Return from interrupt (14 cycles)</summary>
+    public const byte RETI = 14;
+    
+    /// <summary>RETN - Return from non-maskable interrupt (14 cycles)</summary>
+    public const byte RETN = 14;
+    
+    #endregion
 }

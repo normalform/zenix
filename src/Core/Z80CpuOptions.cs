@@ -1,8 +1,12 @@
 namespace Zenix.Core;
 
-public class Z80CpuOptions
-{
-    public double ClockMHz { get; set; } = 3.58;
-    public int RomSize { get; set; } = 0x10000;
-    public int RamSize { get; set; } = 0x10000;
-}
+/// <summary>
+/// Immutable configuration options for Z80 CPU emulation
+/// </summary>
+/// <param name="ClockMHz">CPU clock frequency in MHz (default: 3.58)</param>
+/// <param name="RomSize">ROM size in bytes (default: 64KB)</param>
+/// <param name="RamSize">RAM size in bytes (default: 64KB)</param>
+public record Z80CpuOptions(
+    double ClockMHz = 3.58,
+    int RomSize = 0x10000,
+    int RamSize = 0x10000);

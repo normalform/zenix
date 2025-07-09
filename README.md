@@ -29,15 +29,42 @@ It is built in **C# with .NET 8**, featuring clean architecture, full observabil
 
 ### 🖥️ Desktop (CLI)
 
+The project currently includes several demonstration programs to showcase different aspects of the emulator:
+
 ```bash
-dotnet run --project src/Zenix --rom path/to/game.rom --model MSX2+
+# Run cycle counting demonstration (CPU timing accuracy)
+dotnet run --project src -- cycles
+
+# Run interrupt emulation demonstration (interrupt system)
+dotnet run --project src -- interrupts
+
+# Run configuration demonstration (dependency injection & config)
+dotnet run --project src -- config
+
+# Run all tests
+dotnet test tests/Zenix.Tests.csproj
 ```
 
 ### 🌐 Browser (WASM)
+*WebAssembly frontend is planned for future development*
 
-1. Open the WebAssembly build in your browser
-2. Drag and drop a `.ROM` file into the UI
-3. Use keyboard or gamepad to play!
+### 🧪 Current Implementation Status
+
+✅ **Completed:**
+- **Z80 CPU Core**: Full instruction set with cycle-accurate timing
+- **Interrupt System**: Complete Z80 interrupt implementation with multiple source types
+- **Memory Management**: ROM/RAM management with configurable sizes  
+- **Configuration System**: Immutable records with dependency injection
+- **Clean Architecture**: Proper namespace structure following IDE0130 compliance
+- **Test Suite**: Comprehensive coverage with 90 passing tests
+- **Demonstrations**: Working examples of CPU timing, interrupts, and configuration
+- **Documentation**: Complete coding guidelines and project documentation
+
+🚧 **In Development:**
+- VDP (Video Display Processor) emulation
+- PSG (Programmable Sound Generator) 
+- Floppy disk controller (WD2793)
+- WebAssembly frontend (Blazor WASM)
 
 ---
 
@@ -63,6 +90,40 @@ Comprehensive component design specifications are in [`/docs/design`](docs/desig
 - [🏗️ Design Index](docs/design/README.md) - Navigation and overview
 - [🧮 Z80 CPU Core](docs/design/Core/Z80Cpu.md) - Complete CPU implementation details
 - Additional component designs (planned)
+
+---
+
+## 📁 Project Structure
+
+```
+Zenix/
+├── src/                           # Main source code
+│   ├── CLI/                      # Command-line interface (Zenix.CLI)
+│   ├── Core/                     # CPU and memory components (Zenix.Core)
+│   │   └── Interrupt/           # Interrupt system (Zenix.Core.Interrupt)
+│   ├── App/                     # Application layer (Zenix.App)
+│   │   └── Configuration/       # Configuration system (Zenix.App.Configuration)
+│   ├── Infrastructure/          # Infrastructure services (Zenix.Infrastructure)
+│   └── Web/                     # Web components (Zenix.Web)
+├── tests/                       # Unit tests
+│   └── Core.Tests/             # Core component tests (Zenix.Tests.Core.Tests)
+├── Demos/                       # Demonstration programs (Zenix.Demos)
+├── docs/                        # Documentation
+│   ├── project/                # High-level project documentation
+│   ├── design/                 # Detailed design specifications
+│   └── coding-guidelines.md    # Development standards and conventions
+└── README.md                    # This file
+```
+
+### Key Components
+
+- **🧮 Z80 CPU**: Cycle-accurate instruction execution with comprehensive timing verification
+- **⚡ Interrupt System**: Complete Z80 interrupt implementation (IM 0/1/2, NMI, multiple sources)
+- **🧠 Memory Management**: Configurable ROM/RAM with proper slot management
+- **⚙️ Configuration**: Immutable record-based configuration with DI container support
+- **🧪 Test Suite**: 90 comprehensive unit tests covering all components
+- **🎯 Demonstrations**: Working examples showcasing CPU timing, interrupts, and configuration
+- **📁 Clean Architecture**: IDE0130-compliant namespace structure with proper separation of concerns
 
 ---
 

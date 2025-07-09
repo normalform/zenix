@@ -18,7 +18,7 @@ The Z80 CPU core (`Z80Cpu`) is the heart of the Zenix emulator, providing cycle-
 public class Z80Cpu
 {
     // Core state
-    private readonly MsxMemoryMap _memory;
+    private readonly Z80MemoryMap _memory;
     public Z80CpuOptions Options { get; }
     
     // Timing state
@@ -368,7 +368,7 @@ public class Z80CpuOptions
 ### Initialization
 
 ```csharp
-public Z80Cpu(MsxMemoryMap memory, Z80CpuOptions? options = null)
+public Z80Cpu(Z80MemoryMap memory, Z80CpuOptions? options = null)
 {
     _memory = memory;
     Options = options ?? new Z80CpuOptions();
