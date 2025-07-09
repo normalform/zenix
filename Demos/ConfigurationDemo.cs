@@ -20,7 +20,6 @@ public static class ConfigurationDemo
         Console.WriteLine("=================");
         
         // Create composition root and configure services
-        var compositionRoot = new EmulatorCompositionRoot();
         
         // Create default configuration
         var config = new EmulatorConfiguration();
