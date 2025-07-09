@@ -143,6 +143,21 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
+## ⚙️ Development & Build Requirements
+
+**⚠️ Important: Zenix enforces strict static code analysis and style rules.**
+
+- **All warnings are treated as build errors** - the build will fail if any rule is violated
+- **IDE0130**: Namespaces must match folder structure exactly
+- **IDE0300**: Must use collection expressions (`[1, 2, 3]` instead of `new[] { 1, 2, 3 }`)
+- **IDE0161**: Must use file-scoped namespaces
+- **IDE0011**: All control statements must have braces
+- **IDE0005**: No unnecessary using directives allowed
+
+These rules are enforced through `Directory.Build.props` and `.editorconfig`. See [coding-guidelines.md](docs/coding-guidelines.md) for complete details and examples.
+
+---
+
 ## 🤝 Contributing
 
 Zenix is open to contributors — whether you're into emulation, .NET, HDL, Blazor, or observability, your help is welcome!

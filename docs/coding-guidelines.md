@@ -744,3 +744,235 @@ Zenix.Tests.Core.Tests        # Unit tests
 - **Consistent Organization**: Clear logical separation of concerns
 - **Easier Refactoring**: Moving files automatically suggests correct namespace updates
 - **Team Productivity**: Developers can quickly locate functionality
+
+---
+
+## 🔧 Static Code Analysis and Style Rules
+
+The Zenix project enforces strict static code analysis and style rules through `Directory.Build.props` and `.editorconfig`. **All warnings are treated as errors** to ensure consistent, high code quality.
+
+### Enforced Rules (Error Level)
+
+#### **IDE0130: Namespace Compliance**
+Namespaces MUST match the directory structure exactly:
+
+```csharp
+// ✅ Correct: Namespace matches directory
+// File: src/Core/Interrupt/Z80Interrupt.cs
+namespace Zenix.Core.Interrupt;
+
+// ❌ Error: Namespace doesn't match directory structure
+// File: src/Core/Interrupt/Z80Interrupt.cs  
+namespace Zenix.Core; // Should be Zenix.Core.Interrupt
+```
+
+#### **IDE0300: Collection Expressions**
+Use modern collection expressions instead of array syntax:
+
+```csharp
+// ✅ Correct: Collection expressions
+byte[] data = [0x10, 0x20, 0x30];
+int[] numbers = [1, 2, 3, 4, 5];
+List<string> items = ["item1", "item2", "item3"];
+
+// ❌ Error: Old array syntax
+byte[] data = new byte[] { 0x10, 0x20, 0x30 };
+int[] numbers = new int[] { 1, 2, 3, 4, 5 };
+List<string> items = new List<string> { "item1", "item2", "item3" };
+```
+
+#### **IDE0161: File-Scoped Namespaces**
+All files MUST use file-scoped namespace declarations:
+
+```csharp
+// ✅ Correct: File-scoped namespace
+namespace Zenix.Core.Interrupt;
+
+public class Z80Interrupt : IZ80Interrupt
+{
+    // Implementation
+}
+
+// ❌ Error: Block-scoped namespace
+namespace Zenix.Core.Interrupt
+{
+    public class Z80Interrupt : IZ80Interrupt
+    {
+        // Implementation
+    }
+}
+```
+
+#### **IDE0065: Using Directive Placement**
+Using directives MUST be placed outside namespace declarations:
+
+```csharp
+// ✅ Correct: Using directives outside namespace
+using System;
+using System.Collections.Generic;
+
+namespace Zenix.Core.Interrupt;
+
+public class Z80Interrupt { }
+
+// ❌ Error: Using directives inside namespace
+namespace Zenix.Core.Interrupt
+{
+    using System;
+    using System.Collections.Generic;
+    
+    public class Z80Interrupt { }
+}
+```
+
+#### **IDE0005: Remove Unnecessary Usings**
+All using directives MUST be used in the file:
+
+```csharp
+// ✅ Correct: Only necessary usings
+using System.Collections.Generic;
+
+namespace Zenix.Core;
+
+public class Z80Cpu
+{
+    private readonly List<byte> _memory = []; // Uses System.Collections.Generic
+}
+
+// ❌ Error: Unused using directive
+using System;
+using System.Collections.Generic; // Used
+using System.Linq; // NOT USED - will cause build error
+
+namespace Zenix.Core;
+
+public class Z80Cpu
+{
+    private readonly List<byte> _memory = [];
+}
+```
+
+#### **IDE0011: Add Braces**
+All control flow statements MUST have braces, even for single statements:
+
+```csharp
+// ✅ Correct: Braces on all control statements
+if (condition)
+{
+    DoSomething();
+}
+
+while (running)
+{
+    ProcessCycle();
+}
+
+for (int i = 0; i < count; i++)
+{
+    ProcessItem(i);
+}
+
+// ❌ Error: Missing braces
+if (condition)
+    DoSomething(); // Build error
+
+while (running)
+    ProcessCycle(); // Build error
+
+for (int i = 0; i < count; i++)
+    ProcessItem(i); // Build error
+```
+
+### Build Configuration
+
+#### **Treat Warnings as Errors**
+```xml
+<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+```
+
+This means:
+- ⚠️ **Any warning = Build failure**
+- 🚫 **No "TODO: Fix later" technical debt**
+- ✅ **Consistent code quality across all contributors**
+- 📊 **Zero tolerance for style violations**
+
+#### **Configuration Files**
+
+The strict rules are enforced through two configuration files:
+
+1. **`Directory.Build.props`** (MSBuild level):
+   - Compiler warnings and errors
+   - Static analysis rules (IDE0XXX)
+   - Package references and versions
+   - Assembly metadata
+
+2. **`.editorconfig`** (Editor level):
+   - Code formatting preferences
+   - Indentation and spacing
+   - Naming conventions
+   - Editor behavior
+
+Both files work together to ensure consistency between different IDEs and build environments.
+
+### How to Fix Common Violations
+
+#### Namespace Mismatch (IDE0130)
+```bash
+# Error: Namespace "Zenix.Test" does not match folder structure, expected "Zenix"
+# File: src/SomeClass.cs
+
+# Fix: Update namespace to match directory
+namespace Zenix; // src/ directory = Zenix namespace
+namespace Zenix.Core.Interrupt; // src/Core/Interrupt/ = Zenix.Core.Interrupt
+```
+
+#### Missing Braces (IDE0011)
+```csharp
+// Before (error):
+if (condition)
+    return;
+
+// After (fixed):
+if (condition)
+{
+    return;
+}
+```
+
+#### Unnecessary Usings (IDE0005)
+```csharp
+// Before (error):
+using System; // Not used
+using System.Collections.Generic; // Used
+
+// After (fixed):
+using System.Collections.Generic; // Only keep what's used
+```
+
+#### Collection Expressions (IDE0300)
+```csharp
+// Before (error):
+var data = new byte[] { 0x10, 0x20 };
+
+// After (fixed):
+var data = [0x10, 0x20];
+```
+
+### Development Workflow
+
+1. **Before committing**: Ensure `dotnet build` passes without warnings
+2. **IDE integration**: Configure your IDE to show these rules as errors
+3. **Pull requests**: CI/CD will reject builds with any violations
+4. **Code reviews**: Focus on logic since style is automatically enforced
+
+### Benefits of Strict Rules
+
+- 🔧 **Consistency**: All code follows the same patterns
+- 🐛 **Fewer bugs**: Many common mistakes caught at compile time
+- 📖 **Readability**: Uniform style makes code easier to understand
+- 🔄 **Maintainability**: Refactoring is safer with consistent patterns
+- 👥 **Team efficiency**: No style debates, focus on functionality
+- 📊 **Quality assurance**: Measurable code quality metrics
+
+---

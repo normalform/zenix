@@ -26,14 +26,51 @@ Thank you for your interest in contributing to the Zenix MSX emulator project! W
 ## 📋 Development Guidelines
 
 ### Build Requirements
-- **Strict Build Rules**: All warnings are treated as errors for maximum code quality
-- **Code Analysis**: Static analysis is enabled and enforced on all builds
-- **IDE Rules**: Specific rules are enforced including:
-  - **IDE0130**: Namespace must match folder structure (error)
-  - **IDE0300**: Use collection expressions (error)  
-  - **IDE0161**: Use file-scoped namespaces (error)
-  - **IDE0011**: Add braces to if statements (error)
-  - **IDE0005**: Remove unnecessary using directives (error)
+
+**⚠️ CRITICAL: The Zenix project enforces strict static code analysis and style rules. All warnings are treated as build errors.**
+
+#### **Mandatory Rules (Build Fails if Violated)**
+
+- **TreatWarningsAsErrors**: `true` - No warnings are allowed
+- **EnforceCodeStyleInBuild**: `true` - Style violations cause build failures
+
+#### **Key Enforced Rules (IDE Error Level)**
+
+| Rule | Description | Example Fix |
+|------|-------------|-------------|
+| **IDE0130** | Namespace must match folder structure | `src/Core/Interrupt/` → `namespace Zenix.Core.Interrupt;` |
+| **IDE0300** | Use collection expressions | `new byte[] { 1, 2 }` → `[1, 2]` |
+| **IDE0161** | Use file-scoped namespaces | `namespace Foo { ... }` → `namespace Foo;` |
+| **IDE0065** | Using directives outside namespace | Move `using` statements to top of file |
+| **IDE0005** | Remove unnecessary usings | Delete unused `using` statements |
+| **IDE0011** | Add braces to control statements | `if (x) return;` → `if (x) { return; }` |
+
+#### **Configuration Files**
+
+Two files enforce these rules:
+
+1. **`Directory.Build.props`** (MSBuild level):
+   ```xml
+   <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+   <IDE0130>error</IDE0130>
+   <IDE0300>error</IDE0300>
+   <!-- ... other rules ... -->
+   ```
+
+2. **`.editorconfig`** (Editor level):
+   ```ini
+   [*.cs]
+   dotnet_diagnostic.IDE0130.severity = error
+   dotnet_diagnostic.IDE0300.severity = error
+   csharp_prefer_braces = true:error
+   ```
+
+#### **Development Workflow**
+
+1. **Before any commit**: Run `dotnet build` - it MUST pass with zero warnings
+2. **All pull requests**: Automatically rejected if build fails with violations
+3. **IDE setup**: Configure your editor to show these rules as errors
+4. **Common fixes**: See [coding-guidelines.md](docs/coding-guidelines.md#how-to-fix-common-violations)
 
 ### Code Standards
 - **Follow the [coding guidelines](docs/coding-guidelines.md)** - comprehensive standards for C#, naming, and architecture
