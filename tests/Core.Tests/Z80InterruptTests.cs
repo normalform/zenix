@@ -792,7 +792,6 @@ public class Z80InterruptTests
         cpu.Interrupt.SetInterruptMode(Z80InterruptMode.Mode1);
         cpu.Step(); // EI
         cpu.Step(); // NOP (EI delay)
-        var originalPC = cpu.PC;
         var originalSP = cpu.SP;
         
         // Act
