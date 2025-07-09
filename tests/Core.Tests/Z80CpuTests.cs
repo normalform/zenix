@@ -630,7 +630,7 @@ public class Z80CpuTests
     public void Cpu_Executes_Binary_File()
     {
         // Arrange
-        var binPath = Path.Combine(AppContext.BaseDirectory, "Core.Tests", "Assets", "simple.bin");
+        var binPath = Path.Join(AppContext.BaseDirectory, "Core.Tests", "Assets", "simple.bin");
         if (File.Exists(binPath))
         {
             var rom = File.ReadAllBytes(binPath);
