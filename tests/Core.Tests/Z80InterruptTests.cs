@@ -607,7 +607,7 @@ public class Z80InterruptTests
         // Arrange
         var mockInterrupt = new Mock<IZ80Interrupt>();
         var capturedRequests = new List<Z80InterruptRequest>();
-        var requestReceived = new ManualResetEventSlim();
+        using var requestReceived = new ManualResetEventSlim();
         
         mockInterrupt.Setup(x => x.RequestInterrupt(It.IsAny<Z80InterruptRequest>()))
                     .Callback<Z80InterruptRequest>(request => 
